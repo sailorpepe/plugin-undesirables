@@ -4,7 +4,7 @@
 
 ## What It Does
 
-Adds soul personality, market analysis, Business Pilot (23 modules), Meme Machine, and 15+ skills to any ElizaOS agent.
+Adds soul personality, market analysis, Business Pilot (23 modules), Meme Machine, and 23 skills to any ElizaOS agent.
 
 ### Actions
 
@@ -13,7 +13,7 @@ Adds soul personality, market analysis, Business Pilot (23 modules), Meme Machin
 | `UNDESIRABLE_MARKET_ANALYSIS` | "What do you think about ETH?" | Personality-driven market analysis with risk guardrails |
 | `UNDESIRABLE_BUSINESS_PILOT` | "Set up phone answering for my business" | 23 AI-powered business automation modules |
 | `UNDESIRABLE_MEME_MACHINE` | "Create memes for my barbershop" | Content creation, meme templates, industry packs |
-| `UNDESIRABLE_LOAD_SKILL` | "Check my portfolio" | Auto-matches and loads any of 15+ skills |
+| `UNDESIRABLE_LOAD_SKILL` | "Check my portfolio" | Auto-matches and loads any of 23 skills |
 
 ### Provider
 
@@ -82,7 +82,7 @@ ElizaOS Agent
   │   ├── Action: MARKET_ANALYSIS
   │   ├── Action: BUSINESS_PILOT
   │   ├── Action: MEME_MACHINE
-  │   └── Action: LOAD_SKILL (15+ skills)
+  │   └── Action: LOAD_SKILL (23 skills)
   │
   └── Soul Workspace (token-gated download)
       ├── SOUL.md (personality profile)
