@@ -6,6 +6,7 @@
  *
  * Features:
  * - Load any of 4,444 unique soul personalities
+ * - 23 unique skills across the collection (10 universal + 13 strategy-specific)
  * - Market analysis with personality-driven perspective
  * - Business Pilot — 23 AI-powered business modules
  * - Meme Machine — content creation & marketing
@@ -311,7 +312,7 @@ Create 3 meme concepts with template, text, caption, and export size.`;
 const loadSkillAction: Action = {
   name: "UNDESIRABLE_LOAD_SKILL",
   description:
-    "Load and execute any of the 15+ skills from the Undesirable soul workspace — market analysis, content creation, portfolio check, entry signals, exit strategy, and more.",
+    "Load and execute any of the 23 skills from the Undesirable soul workspace — market analysis, content creation, portfolio check, entry signals, exit strategy, whale tracking, snipe evaluation, and more.",
   similes: [
     "USE_SKILL",
     "RUN_SKILL",
@@ -356,19 +357,37 @@ const loadSkillAction: Action = {
     let matchedSkill = "";
     let matchedName = "";
 
+    // All 23 unique skills mapped with trigger words
     const skillMatches: Record<string, string[]> = {
+      // --- 10 Universal Skills ---
       check_portfolio: ["portfolio", "balance", "holdings", "how am i doing"],
       content_creation: ["tweet", "write", "promote", "content", "thread"],
-      entry_signal: ["entry", "should i buy", "good time to buy", "dip"],
-      exit_strategy: ["exit", "sell", "take profit", "stop loss"],
       conviction_score: ["conviction", "confidence", "how sure"],
-      rebalance_check: ["rebalance", "allocation"],
-      prediction_log: ["predict", "forecast", "call"],
-      risk_assessment: ["risk", "downside", "worst case"],
       image_generation: ["image", "picture", "generate art"],
       music_generation: ["music", "song", "beat", "audio"],
-      compound_strategy: ["compound", "auto-compound", "compounding", "apy"],
-      farm_yield: ["farm", "yield farming", "liquidity", "lp"],
+      prediction_log: ["predict", "forecast", "call"],
+      // business_pilot + meme_machine + market_analysis handled by dedicated Actions above
+      // --- Yield Optimizer Skills ---
+      farm_yield: ["farm", "yield farming", "liquidity", "lp", "best yield"],
+      compound_strategy: ["compound", "auto-compound", "compounding", "apy", "harvest"],
+      risk_assessment: ["risk", "downside", "worst case", "is this safe"],
+      // --- Degen Ape Skills ---
+      snipe_launch: ["snipe", "new launch", "token launching", "just launched"],
+      memecoin_scanner: ["memecoin", "find me a gem", "degen scan", "what memecoins"],
+      ape_checklist: ["should i ape", "ape check", "is this a good ape"],
+      // --- Smart Money Mirror Skills ---
+      whale_tracker: ["whale", "smart money", "whale watch", "what are whales buying"],
+      copy_trade: ["copy trade", "mirror this", "follow this wallet"],
+      position_sizing: ["position size", "how much should i buy", "how big"],
+      // --- Volatility Hunter Skills ---
+      volatility_scan: ["volatile", "volatility", "what's moving", "find volatile"],
+      liquidation_watch: ["liquidation", "liquidation levels", "longs", "shorts"],
+      mev_detect: ["mev", "sandwich", "front-running", "front run"],
+      // --- Structured Trader Skills ---
+      entry_signal: ["entry", "should i buy", "good time to buy", "buy signal"],
+      exit_strategy: ["exit", "sell", "take profit", "stop loss", "when should i sell"],
+      rebalance_check: ["rebalance", "allocation", "portfolio drift"],
+      // --- Balanced Portfolio Skills ---
       diversify_check: ["diversify", "diversification", "spread", "concentrate"],
       sector_rotation: ["sector", "rotation", "rotate", "cycle"],
     };
@@ -463,7 +482,7 @@ const undesirablePlugin: Plugin = {
   description:
     "The Undesirables — 4,444 autonomous AI agents on Ethereum. " +
     "Adds soul personality, market analysis, Business Pilot (23 modules), " +
-    "Meme Machine, and 15+ skills to any ElizaOS agent.",
+    "Meme Machine, and 23 skills to any ElizaOS agent.",
   actions: [
     marketAnalysisAction,
     businessPilotAction,
