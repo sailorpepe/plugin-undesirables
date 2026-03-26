@@ -1,6 +1,6 @@
 {
   "name": "plugin-undesirables",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "ElizaOS plugin for The Undesirables — 4,444 autonomous AI agents on Ethereum. Adds soul personality loading, market analysis, Business Pilot, Meme Machine, and 23 skills to any ElizaOS agent.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
