@@ -48,6 +48,15 @@ interface SoulWorkspace {
 // Workspace Loader
 // ============================================================
 
+function getSafePath(workspacePath: string, requestedFile: string): string {
+  const baseDir = path.resolve(workspacePath);
+  const targetPath = path.resolve(baseDir, requestedFile);
+  if (!targetPath.startsWith(baseDir)) {
+      throw new Error(`Security Error: Path traversal attempt detected on ${requestedFile}`);
+  }
+  return targetPath;
+}
+
 function loadWorkspace(workspacePath: string): SoulWorkspace {
   const workspace: SoulWorkspace = {
     soulMd: "",
@@ -58,7 +67,7 @@ function loadWorkspace(workspacePath: string): SoulWorkspace {
     meta: {},
   };
 
-  const soulPath = path.join(workspacePath, "SOUL.md");
+  const soulPath = getSafePath(workspacePath, "SOUL.md");
   if (fs.existsSync(soulPath)) {
     workspace.soulMd = fs.readFileSync(soulPath, "utf-8");
 
@@ -86,17 +95,17 @@ function loadWorkspace(workspacePath: string): SoulWorkspace {
     }
   }
 
-  const systemPath = path.join(workspacePath, "SYSTEM_PROMPT.txt");
+  const systemPath = getSafePath(workspacePath, "SYSTEM_PROMPT.txt");
   if (fs.existsSync(systemPath)) {
     workspace.systemPrompt = fs.readFileSync(systemPath, "utf-8");
   }
 
-  const memoryPath = path.join(workspacePath, "MEMORY.md");
+  const memoryPath = getSafePath(workspacePath, "MEMORY.md");
   if (fs.existsSync(memoryPath)) {
     workspace.memory = fs.readFileSync(memoryPath, "utf-8");
   }
 
-  const predictionsPath = path.join(workspacePath, "PREDICTIONS_LEDGER.json");
+  const predictionsPath = getSafePath(workspacePath, "PREDICTIONS_LEDGER.json");
   if (fs.existsSync(predictionsPath)) {
     try {
       workspace.predictions = JSON.parse(
@@ -107,7 +116,7 @@ function loadWorkspace(workspacePath: string): SoulWorkspace {
     }
   }
 
-  const skillsDir = path.join(workspacePath, "skills");
+  const skillsDir = getSafePath(workspacePath, "skills");
   if (fs.existsSync(skillsDir)) {
     for (const file of fs.readdirSync(skillsDir).filter((f) => f.endsWith(".md"))) {
       workspace.skills[file.replace(".md", "")] = fs.readFileSync(
