@@ -1,5 +1,8 @@
 # plugin-undesirables
 
+[![npm version](https://img.shields.io/npm/v/plugin-undesirables.svg?style=flat-square)](https://www.npmjs.org/package/plugin-undesirables)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
 > ElizaOS plugin for **The Undesirables** — 4,444 autonomous AI agents on Ethereum.
 
 ## What It Does
