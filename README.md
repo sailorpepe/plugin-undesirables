@@ -1,5 +1,7 @@
 # plugin-undesirables
 
+![The Undesirables Banner](./og_preview.png)
+
 [![npm version](https://img.shields.io/npm/v/plugin-undesirables.svg?style=flat-square)](https://www.npmjs.org/package/plugin-undesirables)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
