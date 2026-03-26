@@ -367,6 +367,10 @@ const loadSkillAction: Action = {
       risk_assessment: ["risk", "downside", "worst case"],
       image_generation: ["image", "picture", "generate art"],
       music_generation: ["music", "song", "beat", "audio"],
+      compound_strategy: ["compound", "auto-compound", "compounding", "apy"],
+      farm_yield: ["farm", "yield farming", "liquidity", "lp"],
+      diversify_check: ["diversify", "diversification", "spread", "concentrate"],
+      sector_rotation: ["sector", "rotation", "rotate", "cycle"],
     };
 
     for (const [skillName, triggers] of Object.entries(skillMatches)) {
