@@ -107,7 +107,7 @@ If you don't want to use the Plugin abstraction layer above, you can force-conve
 # Setup the MCP server repo and run:
 node soul-to-eliza.js --token 420
 ```
-→ [undesirables-mcp-server](https://github.com/sailorpepe/undesirables-mcp-server)
+→ [undesirables-mcp-server](https://gitlab.com/meme-merchants/undesirables-mcp-server)
 
 ## The Undesirables Ecosystem
 
@@ -115,6 +115,6 @@ node soul-to-eliza.js --token 420
 
 - **Website**: [the-undesirables.com](https://the-undesirables.com)
 - **Mint**: [scatter.art/the-undesirables](https://scatter.art/the-undesirables)
-- **MCP Server**: [github.com/sailorpepe/undesirables-mcp-server](https://github.com/sailorpepe/undesirables-mcp-server)
+- **MCP Server**: [gitlab.com/meme-merchants/undesirables-mcp-server](https://gitlab.com/meme-merchants/undesirables-mcp-server)
 
 EST. 2026 🐸
