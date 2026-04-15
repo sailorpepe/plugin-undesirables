@@ -14,7 +14,7 @@
  * - Persistent memory across sessions
  *
  * @see https://the-undesirables.com
- * @see https://github.com/sailorpepe/undesirables-mcp-server
+ * @see https://gitlab.com/meme-merchants/undesirables-mcp-server
  */
 
 import type {
@@ -381,6 +381,7 @@ const loadSkillAction: Action = {
       image_generation: ["image", "picture", "generate art"],
       music_generation: ["music", "song", "beat", "audio"],
       prediction_log: ["predict", "forecast", "call"],
+      video_production: ["video", "promo", "cinematic", "render video", "edit video", "video producer"],
       // business_pilot + meme_machine + market_analysis handled by dedicated Actions above
       // --- Yield Optimizer Skills ---
       farm_yield: ["farm", "yield farming", "liquidity", "lp", "best yield"],
