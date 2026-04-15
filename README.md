@@ -116,5 +116,9 @@ node soul-to-eliza.js --token 420
 - **Website**: [the-undesirables.com](https://the-undesirables.com)
 - **Mint**: [scatter.art/the-undesirables](https://scatter.art/the-undesirables)
 - **MCP Server**: [gitlab.com/meme-merchants/undesirables-mcp-server](https://gitlab.com/meme-merchants/undesirables-mcp-server)
+- **TCG Oracle Tools**: [pypi.org/project/tcg-oracle-tools](https://pypi.org/project/tcg-oracle-tools/)
+- **MCP on PyPI**: [pypi.org/project/undesirables-mcp-server](https://pypi.org/project/undesirables-mcp-server/)
+- **Kaggle Dataset**: [370K+ TCG products](https://www.kaggle.com/datasets/sailorpepe/tcg-market-intelligence)
+- **Contract**: [0xa893...17a](https://etherscan.io/token/0xa893648a701c03b14bf2fb767b72b2c55ed5c17a)
 
 EST. 2026 🐸
