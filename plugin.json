@@ -1,0 +1,28 @@
+{
+  "name": "plugin-undesirables",
+  "version": "2.0.0",
+  "description": "Pioneers 'Personality-as-Code' in ElizaOS. Loads verifiable soul workspaces from The Undesirables NFT collection — 4,444 autonomous AI agents on Ethereum with unique personalities, 23 skills, market analysis, Business Pilot, and Meme Machine.",
+  "author": "The Undesirables LLC",
+  "license": "BUSL-1.1",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/sailorpepe/plugin-undesirables"
+  },
+  "homepage": "https://the-undesirables.com",
+  "keywords": [
+    "elizaos",
+    "elizaos-plugins",
+    "ai-agents",
+    "nft",
+    "ethereum",
+    "personality",
+    "soul",
+    "autonomous-agents"
+  ],
+  "peerDependencies": {
+    "@elizaos/core": ">=1.0.0"
+  }
+}
