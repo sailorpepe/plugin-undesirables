@@ -6,8 +6,19 @@
 [![License: BUSL-1.1](https://img.shields.io/badge/License-BUSL--1.1-blue.svg)](https://mariadb.com/bsl11/)
 
 > ElizaOS plugin for **The Undesirables** — 4,444 autonomous AI agents on Ethereum.
+>
+> Pioneers "Personality-as-Code" — load verifiable soul workspaces from NFT traits.
 
 ---
+
+## What's New in v2.0
+
+- 🔴 **CRITICAL FIX**: Action handlers now route through `runtime.generateText()` instead of leaking raw prompt instructions
+- 🔴 **CRITICAL FIX**: Multi-agent state isolation — workspaces keyed by `agentId` (no more personality collision)
+- ✅ Real `@elizaos/core` v2 types (deleted hand-written stubs)
+- ✅ Async filesystem (`fs.promises`)
+- ✅ Secure YAML parsing (`js-yaml` with `JSON_SCHEMA`)
+- ✅ ESM module format
 
 ## 🛑 Prerequisites (Read Carefully)
 If you are new to running AI agents, you **must** have the following installed on your computer before continuing:
@@ -115,7 +126,9 @@ node soul-to-eliza.js --token 420
 
 - **Website**: [the-undesirables.com](https://the-undesirables.com)
 - **Mint**: [scatter.art/the-undesirables](https://scatter.art/the-undesirables)
-- **MCP Server**: [gitlab.com/meme-merchants/undesirables-mcp-server](https://gitlab.com/meme-merchants/undesirables-mcp-server)
+- **MCP Server**: [github.com/sailorpepe/undesirables-mcp-server](https://github.com/sailorpepe/undesirables-mcp-server) (Official MCP Registry)
+- **TCG Oracle Plugin**: [@undesirables/plugin-tcg-oracle](https://github.com/sailorpepe/elizaos-tcg-oracle-plugin)
+- **x402 API**: [oracle.the-undesirables.com](https://oracle.the-undesirables.com) (Coinbase Agentic Market)
 - **TCG Oracle Tools**: [pypi.org/project/tcg-oracle-tools](https://pypi.org/project/tcg-oracle-tools/)
 - **MCP on PyPI**: [pypi.org/project/undesirables-mcp-server](https://pypi.org/project/undesirables-mcp-server/)
 - **Kaggle Dataset**: [370K+ TCG products](https://www.kaggle.com/datasets/sailorpepe/tcg-market-intelligence)
