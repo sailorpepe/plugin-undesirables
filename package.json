@@ -1,12 +1,14 @@
 {
   "name": "plugin-undesirables",
-  "version": "1.0.5",
-  "description": "ElizaOS plugin for The Undesirables \u2014 4,444 autonomous AI agents on Ethereum. Adds soul personality loading, market analysis, Business Pilot, Meme Machine, and 23 skills to any ElizaOS agent.",
+  "version": "2.0.0",
+  "description": "ElizaOS plugin for The Undesirables — 4,444 autonomous AI agents on Ethereum. Pioneers 'Personality-as-Code' via verifiable soul workspaces. Adds soul personality loading, market analysis, Business Pilot, Meme Machine, and 23 skills to any ElizaOS agent.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
+  "type": "module",
   "scripts": {
     "build": "tsc",
-    "clean": "rm -rf dist"
+    "clean": "rm -rf dist",
+    "test": "vitest run"
   },
   "keywords": [
     "elizaos",
@@ -18,9 +20,12 @@
     "mcp",
     "ollama",
     "autonomous-agents",
-    "defi"
+    "defi",
+    "personality",
+    "soul",
+    "byos"
   ],
-  "author": "The Undesirables (sailorpepe)",
+  "author": "The Undesirables LLC (sailorpepe)",
   "license": "BUSL-1.1",
   "repository": {
     "type": "git",
@@ -28,9 +33,16 @@
   },
   "homepage": "https://the-undesirables.com",
   "peerDependencies": {
-    "@elizaos/core": "^1.0.0"
+    "@elizaos/core": ">=1.0.0"
   },
   "devDependencies": {
-    "typescript": "^5.4.0"
+    "@elizaos/core": "2.0.0-alpha.77",
+    "js-yaml": "^4.1.0",
+    "@types/js-yaml": "^4.0.9",
+    "typescript": "^5.4.0",
+    "vitest": "^3.0.0"
+  },
+  "dependencies": {
+    "js-yaml": "^4.1.0"
   }
 }
