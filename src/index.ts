@@ -27,6 +27,8 @@ import type {
   State,
   HandlerCallback,
   ActionExample,
+  ActionResult,
+  ProviderResult,
 } from "@elizaos/core";
 
 import * as fs from "fs";
@@ -80,13 +82,12 @@ async function loadWorkspace(workspacePath: string): Promise<SoulWorkspace> {
   if (fs.existsSync(soulPath)) {
     workspace.soulMd = await fs.promises.readFile(soulPath, "utf-8");
 
-    // Parse YAML frontmatter securely via js-yaml with JSON_SCHEMA (no custom types)
+    // Parse YAML frontmatter securely via js-yaml with JSON_SCHEMA
     const fmMatch = workspace.soulMd.match(/^---\n([\s\S]*?)\n---/);
     if (fmMatch) {
       try {
         const parsed = yaml.load(fmMatch[1], { schema: yaml.JSON_SCHEMA }) as Record<string, any>;
         if (parsed && typeof parsed === "object") {
-          // Block prototype pollution vectors
           for (const key of Object.keys(parsed)) {
             if (key === "__proto__" || key === "constructor" || key === "prototype") continue;
             workspace.meta[key] = parsed[key];
@@ -141,7 +142,7 @@ function getWorkspace(runtime: IAgentRuntime): SoulWorkspace | null {
 }
 
 // ============================================================
-// Helper: Build context for LLM generation
+// Helper: Build context string for LLM
 // ============================================================
 
 function buildSkillContext(
@@ -172,6 +173,32 @@ Respond in character using your archetype, risk tolerance, and guardrails.`;
 }
 
 // ============================================================
+// Helper: Generate response through LLM via runtime.generateText
+// ============================================================
+
+async function generateResponse(
+  runtime: IAgentRuntime,
+  context: string,
+  callback?: HandlerCallback,
+  actionName?: string
+): Promise<ActionResult> {
+  try {
+    const result = await runtime.generateText(context);
+    const text = typeof result === "string" ? result : result?.text || context;
+    if (callback) {
+      await callback({ text, source: "plugin-undesirables" }, actionName);
+    }
+    return { success: true, text };
+  } catch {
+    // Fallback: return context as-is if generateText unavailable
+    if (callback) {
+      await callback({ text: context, source: "plugin-undesirables" }, actionName);
+    }
+    return { success: true, text: context };
+  }
+}
+
+// ============================================================
 // ACTIONS
 // ============================================================
 
@@ -189,11 +216,11 @@ const marketAnalysisAction: Action = {
   examples: [
     [
       {
-        user: "{{user1}}",
+        name: "{{user1}}",
         content: { text: "What do you think about ETH right now?" },
       } as ActionExample,
       {
-        user: "{{agentName}}",
+        name: "{{agentName}}",
         content: {
           text: "Let me run my market analysis on ETH...",
           action: "UNDESIRABLE_MARKET_ANALYSIS",
@@ -207,14 +234,14 @@ const marketAnalysisAction: Action = {
   handler: async (
     runtime: IAgentRuntime,
     message: Memory,
-    _state: State | undefined,
-    _options: Record<string, unknown> | undefined,
+    _state?: State,
+    _options?: Record<string, unknown>,
     callback?: HandlerCallback
-  ) => {
+  ): Promise<ActionResult | undefined> => {
     const workspace = getWorkspace(runtime);
     if (!workspace) {
-      if (callback) callback({ text: "No soul workspace loaded. Set UNDESIRABLES_WORKSPACE in your character.json settings." });
-      return false;
+      if (callback) await callback({ text: "No soul workspace loaded. Set UNDESIRABLES_WORKSPACE in your character.json settings." });
+      return { success: false, error: "No soul workspace loaded" };
     }
 
     const skill = workspace.skills["market_analysis"] || "";
@@ -225,20 +252,7 @@ const marketAnalysisAction: Action = {
       "Provide a detailed market analysis with conviction score, risk assessment, and actionable levels."
     );
 
-    // Route through LLM generation instead of leaking raw prompt
-    try {
-      const { generateText, ModelClass } = await import("@elizaos/core");
-      const responseText = await generateText({
-        runtime,
-        context,
-        modelClass: ModelClass.LARGE,
-      });
-      if (callback) callback({ text: responseText, action: "UNDESIRABLE_MARKET_ANALYSIS" });
-    } catch {
-      // Fallback for environments where generateText isn't available
-      if (callback) callback({ text: `[Market Analysis]\n\n${context}` });
-    }
-    return true;
+    return generateResponse(runtime, context, callback, "UNDESIRABLE_MARKET_ANALYSIS");
   },
 };
 
@@ -256,13 +270,11 @@ const businessPilotAction: Action = {
   examples: [
     [
       {
-        user: "{{user1}}",
-        content: {
-          text: "I run a barbershop. Help me set up phone answering.",
-        },
+        name: "{{user1}}",
+        content: { text: "I run a barbershop. Help me set up phone answering." },
       } as ActionExample,
       {
-        user: "{{agentName}}",
+        name: "{{agentName}}",
         content: {
           text: "Loading Business Pilot skill for your barbershop...",
           action: "UNDESIRABLE_BUSINESS_PILOT",
@@ -277,14 +289,14 @@ const businessPilotAction: Action = {
   handler: async (
     runtime: IAgentRuntime,
     message: Memory,
-    _state: State | undefined,
-    _options: Record<string, unknown> | undefined,
+    _state?: State,
+    _options?: Record<string, unknown>,
     callback?: HandlerCallback
-  ) => {
+  ): Promise<ActionResult | undefined> => {
     const workspace = getWorkspace(runtime);
     if (!workspace) {
-      if (callback) callback({ text: "No soul workspace loaded." });
-      return false;
+      if (callback) await callback({ text: "No soul workspace loaded." });
+      return { success: false, error: "No soul workspace loaded" };
     }
 
     const skill = workspace.skills["business_pilot"] || "";
@@ -295,14 +307,7 @@ const businessPilotAction: Action = {
       "Recommend the top 3-5 modules they should set up first with exact steps."
     );
 
-    try {
-      const { generateText, ModelClass } = await import("@elizaos/core");
-      const responseText = await generateText({ runtime, context, modelClass: ModelClass.LARGE });
-      if (callback) callback({ text: responseText, action: "UNDESIRABLE_BUSINESS_PILOT" });
-    } catch {
-      if (callback) callback({ text: `[Business Pilot]\n\n${context}` });
-    }
-    return true;
+    return generateResponse(runtime, context, callback, "UNDESIRABLE_BUSINESS_PILOT");
   },
 };
 
@@ -320,11 +325,11 @@ const memeMachineAction: Action = {
   examples: [
     [
       {
-        user: "{{user1}}",
+        name: "{{user1}}",
         content: { text: "Create some memes for my barbershop" },
       } as ActionExample,
       {
-        user: "{{agentName}}",
+        name: "{{agentName}}",
         content: {
           text: "Firing up the Meme Machine for barbershop content...",
           action: "UNDESIRABLE_MEME_MACHINE",
@@ -339,14 +344,14 @@ const memeMachineAction: Action = {
   handler: async (
     runtime: IAgentRuntime,
     message: Memory,
-    _state: State | undefined,
-    _options: Record<string, unknown> | undefined,
+    _state?: State,
+    _options?: Record<string, unknown>,
     callback?: HandlerCallback
-  ) => {
+  ): Promise<ActionResult | undefined> => {
     const workspace = getWorkspace(runtime);
     if (!workspace) {
-      if (callback) callback({ text: "No soul workspace loaded." });
-      return false;
+      if (callback) await callback({ text: "No soul workspace loaded." });
+      return { success: false, error: "No soul workspace loaded" };
     }
 
     const skill = workspace.skills["meme_machine"] || "";
@@ -357,14 +362,7 @@ const memeMachineAction: Action = {
       "Create 3 meme concepts with template, text, caption, and export size."
     );
 
-    try {
-      const { generateText, ModelClass } = await import("@elizaos/core");
-      const responseText = await generateText({ runtime, context, modelClass: ModelClass.LARGE });
-      if (callback) callback({ text: responseText, action: "UNDESIRABLE_MEME_MACHINE" });
-    } catch {
-      if (callback) callback({ text: `[Meme Machine]\n\n${context}` });
-    }
-    return true;
+    return generateResponse(runtime, context, callback, "UNDESIRABLE_MEME_MACHINE");
   },
 };
 
@@ -384,11 +382,11 @@ const loadSkillAction: Action = {
   examples: [
     [
       {
-        user: "{{user1}}",
+        name: "{{user1}}",
         content: { text: "Check my portfolio" },
       } as ActionExample,
       {
-        user: "{{agentName}}",
+        name: "{{agentName}}",
         content: {
           text: "Loading portfolio check skill...",
           action: "UNDESIRABLE_LOAD_SKILL",
@@ -402,14 +400,14 @@ const loadSkillAction: Action = {
   handler: async (
     runtime: IAgentRuntime,
     message: Memory,
-    _state: State | undefined,
-    _options: Record<string, unknown> | undefined,
+    _state?: State,
+    _options?: Record<string, unknown>,
     callback?: HandlerCallback
-  ) => {
+  ): Promise<ActionResult | undefined> => {
     const workspace = getWorkspace(runtime);
     if (!workspace) {
-      if (callback) callback({ text: "No soul workspace loaded." });
-      return false;
+      if (callback) await callback({ text: "No soul workspace loaded." });
+      return { success: false, error: "No soul workspace loaded" };
     }
 
     const text = message.content.text?.toLowerCase() || "";
@@ -418,7 +416,6 @@ const loadSkillAction: Action = {
 
     // All 23 unique skills mapped with trigger words
     const skillMatches: Record<string, string[]> = {
-      // --- 10 Universal Skills ---
       check_portfolio: ["portfolio", "balance", "holdings", "how am i doing"],
       content_creation: ["tweet", "write", "promote", "content", "thread"],
       conviction_score: ["conviction", "confidence", "how sure"],
@@ -426,27 +423,21 @@ const loadSkillAction: Action = {
       music_generation: ["music", "song", "beat", "audio"],
       prediction_log: ["predict", "forecast", "call"],
       video_production: ["video", "promo", "cinematic", "render video", "edit video"],
-      // --- Yield Optimizer Skills ---
       farm_yield: ["farm", "yield farming", "liquidity", "lp", "best yield"],
       compound_strategy: ["compound", "auto-compound", "compounding", "apy", "harvest"],
       risk_assessment: ["risk", "downside", "worst case", "is this safe"],
-      // --- Degen Ape Skills ---
       snipe_launch: ["snipe", "new launch", "token launching", "just launched"],
       memecoin_scanner: ["memecoin", "find me a gem", "degen scan", "what memecoins"],
       ape_checklist: ["should i ape", "ape check", "is this a good ape"],
-      // --- Smart Money Mirror Skills ---
       whale_tracker: ["whale", "smart money", "whale watch", "what are whales buying"],
       copy_trade: ["copy trade", "mirror this", "follow this wallet"],
       position_sizing: ["position size", "how much should i buy", "how big"],
-      // --- Volatility Hunter Skills ---
       volatility_scan: ["volatile", "volatility", "what's moving", "find volatile"],
       liquidation_watch: ["liquidation", "liquidation levels", "longs", "shorts"],
       mev_detect: ["mev", "sandwich", "front-running", "front run"],
-      // --- Structured Trader Skills ---
       entry_signal: ["entry", "should i buy", "good time to buy", "buy signal"],
       exit_strategy: ["exit", "sell", "take profit", "stop loss", "when should i sell"],
       rebalance_check: ["rebalance", "allocation", "portfolio drift"],
-      // --- Balanced Portfolio Skills ---
       diversify_check: ["diversify", "diversification", "spread", "concentrate"],
       sector_rotation: ["sector", "rotation", "rotate", "cycle"],
     };
@@ -464,11 +455,11 @@ const loadSkillAction: Action = {
         .filter((k) => k !== "_index")
         .join(", ");
       if (callback) {
-        callback({
+        await callback({
           text: `Available skills: ${available}. Tell me what you need and I'll load the right one.`,
         });
       }
-      return true;
+      return { success: true, text: `Listed ${available.split(", ").length} available skills` };
     }
 
     const context = buildSkillContext(
@@ -478,14 +469,7 @@ const loadSkillAction: Action = {
       `Execute the ${matchedName.replace(/_/g, " ")} skill thoroughly.`
     );
 
-    try {
-      const { generateText, ModelClass } = await import("@elizaos/core");
-      const responseText = await generateText({ runtime, context, modelClass: ModelClass.LARGE });
-      if (callback) callback({ text: responseText, action: "UNDESIRABLE_LOAD_SKILL" });
-    } catch {
-      if (callback) callback({ text: `[${matchedName}]\n\n${context}` });
-    }
-    return true;
+    return generateResponse(runtime, context, callback, "UNDESIRABLE_LOAD_SKILL");
   },
 };
 
@@ -494,7 +478,9 @@ const loadSkillAction: Action = {
 // ============================================================
 
 const soulProvider: Provider = {
-  get: async (runtime: IAgentRuntime, _message: Memory) => {
+  name: "undesirables-soul",
+  description: "Injects Undesirable soul personality context into every agent response",
+  get: async (runtime: IAgentRuntime, _message: Memory, _state: State): Promise<ProviderResult> => {
     // Load workspace if not already loaded for this agent
     if (!workspaces.has(runtime.agentId)) {
       const workspacePath =
@@ -513,10 +499,13 @@ const soulProvider: Provider = {
 
     const workspace = getWorkspace(runtime);
     if (!workspace) {
-      return "No Undesirable soul workspace loaded. Set UNDESIRABLES_WORKSPACE env var to your downloaded workspace path.";
+      return {
+        text: "No Undesirable soul workspace loaded. Set UNDESIRABLES_WORKSPACE env var to your downloaded workspace path.",
+      };
     }
 
-    return `[SOUL CONTEXT]
+    return {
+      text: `[SOUL CONTEXT]
 Name: ${workspace.meta.name || "Unknown Undesirable"}
 Archetype: ${workspace.meta.archetype || "Unknown"}
 Strategy: ${workspace.meta.strategy || "Unknown"}
@@ -529,7 +518,14 @@ Personality: ${(workspace.meta.adjectives || []).join(", ")}
 
 The agent should respond using the personality and style defined in its soul.
 Collection: The Undesirables — 4,444 autonomous AI agents on Ethereum.
-Website: https://the-undesirables.com`;
+Website: https://the-undesirables.com`,
+      values: {
+        soulName: workspace.meta.name || "Unknown",
+        archetype: workspace.meta.archetype || "Unknown",
+        strategy: workspace.meta.strategy || "Unknown",
+        tokenId: workspace.meta.token_id || "?",
+      },
+    };
   },
 };
 
