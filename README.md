@@ -1,137 +1,177 @@
 # plugin-undesirables
 
-![The Undesirables Banner](./og_preview.png)
+![The Undesirables Banner](./images/banner.jpg)
 
-[![npm version](https://img.shields.io/npm/v/plugin-undesirables.svg?style=flat-square)](https://www.npmjs.org/package/plugin-undesirables)
-[![License: BUSL-1.1](https://img.shields.io/badge/License-BUSL--1.1-blue.svg)](https://mariadb.com/bsl11/)
+[![npm version](https://img.shields.io/npm/v/plugin-undesirables.svg)](https://www.npmjs.org/package/plugin-undesirables)
+[![License: BUSL-1.1](https://img.shields.io/badge/License-BUSL--1.1-blue.svg)](LICENSE)
 
-> ElizaOS plugin for **The Undesirables** — 4,444 autonomous AI agents on Ethereum.
->
-> Pioneers "Personality-as-Code" — load verifiable soul workspaces from NFT traits.
+> Give any ElizaOS agent a persistent personality, market analysis skills, business automation, and content creation — all driven by a downloadable "soul workspace."
+
+---
+
+## What This Does
+
+Most AI agents are blank slates. They answer questions but have no personality, no memory, no conviction. This plugin changes that.
+
+When you install `plugin-undesirables`, your ElizaOS agent gets:
+
+- **A real personality** — not a system prompt hack, but a structured workspace with Big Five psychology scores, an archetype, a strategy style, adjectives, guardrails, and a backstory. The personality persists across sessions and colors every response.
+- **Market analysis with conviction** — your agent doesn't just parrot data. It filters through its own risk tolerance and strategy to give you opinionated takes with conviction scores.
+- **23 built-in skills** — portfolio checks, entry signals, exit strategies, whale tracking, meme creation, video production, music generation, and more. The agent auto-matches the right skill to your message.
+- **Business Pilot** — 23 AI-powered business automation modules: phone answering, SMS autoresponders, invoice chasers, appointment scheduling. Your agent becomes a business operations assistant.
+- **Meme Machine** — content creation, brand voice setup, content calendars, and industry-specific meme packs. Your agent becomes a social media manager.
+
+---
+
+## Quick Start
+
+### 1. Install
+
+```bash
+npm install plugin-undesirables
+```
+
+### 2. Get a Soul Workspace
+
+Go to [the-undesirables.com/soul](https://the-undesirables.com/soul), connect your wallet, and download your workspace. Unzip it somewhere on your machine.
+
+Each workspace contains:
+- `SOUL.md` — personality profile (Big Five scores, archetype, strategy, backstory)
+- `SYSTEM_PROMPT.txt` — the full instruction set
+- `MEMORY.md` — persistent memory file
+- `PREDICTIONS_LEDGER.json` — track record of market calls
+- `skills/` — 10-23 skill files depending on the agent's traits
+
+### 3. Configure
+
+Add to your ElizaOS `character.json`:
+
+**macOS / Linux:**
+```json
+{
+  "plugins": ["plugin-undesirables"],
+  "settings": {
+    "UNDESIRABLES_WORKSPACE": "/Users/YourName/Desktop/soul_0420"
+  }
+}
+```
+
+**Windows:**
+```json
+{
+  "plugins": ["plugin-undesirables"],
+  "settings": {
+    "UNDESIRABLES_WORKSPACE": "C:\\Users\\YourName\\Desktop\\soul_0420"
+  }
+}
+```
+
+### 4. Run
+
+```bash
+elizaos start --character your-character.json
+```
+
+Your agent now has a persistent personality that influences every conversation.
+
+---
+
+## Actions
+
+| Action | Trigger Examples | What Happens |
+|--------|-----------------|--------------|
+| `UNDESIRABLE_MARKET_ANALYSIS` | "What do you think about ETH?" | Personality-driven market analysis with risk guardrails and conviction scoring |
+| `UNDESIRABLE_BUSINESS_PILOT` | "Set up phone answering for my barbershop" | Loads the Business Pilot skill, recommends top modules with setup steps |
+| `UNDESIRABLE_MEME_MACHINE` | "Create memes for my coffee shop" | Generates meme concepts, captions, content calendars, brand voice |
+| `UNDESIRABLE_LOAD_SKILL` | "Check my portfolio" / "Should I ape?" | Auto-matches your message to one of 23 skills and executes it |
+
+### All 23 Skills
+
+| Skill | Trigger Words |
+|-------|--------------|
+| Portfolio Check | "portfolio", "balance", "holdings" |
+| Content Creation | "tweet", "write", "promote", "thread" |
+| Entry Signal | "should I buy", "buy signal", "good time to buy" |
+| Exit Strategy | "sell", "take profit", "stop loss" |
+| Risk Assessment | "risk", "downside", "worst case", "is this safe" |
+| Whale Tracker | "whale", "smart money", "what are whales buying" |
+| Conviction Score | "conviction", "confidence", "how sure" |
+| Snipe Launch | "snipe", "new launch", "just launched" |
+| Memecoin Scanner | "memecoin", "find me a gem", "degen scan" |
+| Ape Checklist | "should I ape", "ape check" |
+| Position Sizing | "position size", "how much should I buy" |
+| Volatility Scan | "volatile", "what's moving" |
+| Liquidation Watch | "liquidation levels", "longs", "shorts" |
+| MEV Detection | "mev", "sandwich", "front-running" |
+| Farm Yield | "yield farming", "liquidity", "best yield" |
+| Compound Strategy | "compound", "auto-compound", "apy" |
+| Copy Trade | "copy trade", "mirror this wallet" |
+| Rebalance Check | "rebalance", "allocation", "portfolio drift" |
+| Diversification | "diversify", "spread", "concentrate" |
+| Sector Rotation | "sector", "rotation", "cycle" |
+| Image Generation | "image", "picture", "generate art" |
+| Music Generation | "music", "song", "beat" |
+| Video Production | "video", "promo", "render video" |
+
+---
+
+## How Personality Works
+
+Each soul workspace has a `SOUL.md` file with structured personality data:
+
+```yaml
+name: "Doña Crypto"
+archetype: "The Oracle"
+strategy: "Long-term accumulation with high conviction"
+adjectives: ["analytical", "patient", "contrarian"]
+openness: 82
+conscientiousness: 91
+extraversion: 34
+agreeableness: 45
+neuroticism: 28
+```
+
+The `soulProvider` injects this context into **every** agent response automatically. Your agent doesn't just have personality on request — it's always in character.
+
+This means two different Undesirable agents will give you completely different takes on the same market question, filtered through their individual psychology.
+
+---
+
+## Multi-Agent Safety
+
+Workspaces are keyed by `runtime.agentId`. You can run multiple Undesirable agents in the same ElizaOS instance without personality collision. Agent #420 won't leak into Agent #69's responses.
+
+---
+
+## Troubleshooting
+
+| Error | Fix |
+|-------|-----|
+| `Workspace /path/ does not exist` | Check the path in your `character.json`. It must be the **absolute** path to the unzipped workspace. Windows users: use double backslashes `\\`. |
+| `Invalid JSON Error` | Your `character.json` has a syntax error. Open it in VS Code or Cursor and fix the formatting. |
+| `No soul workspace loaded` | The `UNDESIRABLES_WORKSPACE` setting is missing or the path doesn't exist. |
 
 ---
 
 ## What's New in v2.0
 
-- 🔴 **CRITICAL FIX**: Action handlers now route through `runtime.generateText()` instead of leaking raw prompt instructions
-- 🔴 **CRITICAL FIX**: Multi-agent state isolation — workspaces keyed by `agentId` (no more personality collision)
-- ✅ Real `@elizaos/core` v2 types (deleted hand-written stubs)
-- ✅ Async filesystem (`fs.promises`)
-- ✅ Secure YAML parsing (`js-yaml` with `JSON_SCHEMA`)
-- ✅ ESM module format
-
-## 🛑 Prerequisites (Read Carefully)
-If you are new to running AI agents, you **must** have the following installed on your computer before continuing:
-1. **[Node.js](https://nodejs.org)** (Version 23+ recommended).
-2. **An existing ElizaOS bot**. This is a huge multi-agent framework. If you don't have one running yet, go read the official [ElizaOS documentation](https://elizaos.github.io/eliza/) first to set up your bot locally, then come back here to drop your Undesirable soul into it!
+- Action handlers route through `runtime.generateText()` instead of leaking raw prompt instructions
+- Multi-agent state isolation — workspaces keyed by `agentId`
+- Real `@elizaos/core` v2 types (no more hand-written stubs)
+- Async filesystem (`fs.promises`)
+- Secure YAML parsing (`js-yaml` with `JSON_SCHEMA`)
+- ESM module format
 
 ---
 
-## 📂 Step 1: Downloading Your Soul Workspace
+## Related Projects
 
-Your AI agent isn't just code—it has an actual personality governed completely by the visual traits of your specific NFT.
-
-1. Go to [the-undesirables.com/soul](https://the-undesirables.com/soul) and connect the wallet holding your NFT.
-2. Click **Download Workspace**.
-3. Move the downloaded `.zip` file into a safe folder on your computer (like your Desktop) and **unzip it**. 
-4. This unzipped folder is your **Workspace**. *Do not arbitrarily delete files inside of it.*
+- [@undesirables/plugin-tcg-oracle](https://github.com/sailorpepe/elizaos-tcg-oracle-plugin) — Trading card market intelligence (search, grade, simulate)
+- [undesirables-mcp-server](https://github.com/sailorpepe/undesirables-mcp-server) — 36-tool MCP server (Glama Registry, PyPI)
+- [the-undesirables.com](https://the-undesirables.com) — The Undesirables NFT collection
 
 ---
 
-## 🔧 Step 2: Injecting the Plugin
+## License
 
-Open your computer's terminal, navigate to your existing ElizaOS bot folder, and install this specific adapter plugin:
-
-```bash
-# Mac / Linux / Windows
-npm install plugin-undesirables
-```
-
-Next, open your Eliza agent's main `character.json` file. You need to do two strict things:
-1. Add the plugin to your `plugins` array.
-2. Provide the **ABSOLUTE FULL PATH** on your hard drive to the Soul Workspace you unzipped in Step 1.
-
-**🍎 Example `character.json` on Mac (Use forward slashes `/`):**
-```json
-{
-  "settings": {
-    "UNDESIRABLES_WORKSPACE": "/Users/YourName/Desktop/soul_folder/0420"
-  },
-  "plugins": ["plugin-undesirables"]
-}
-```
-
-**🪟 Example `character.json` on Windows (Use double backslashes `\\`):**
-```json
-{
-  "settings": {
-    "UNDESIRABLES_WORKSPACE": "C:\\Users\\YourName\\Desktop\\soul_folder\\0420"
-  },
-  "plugins": ["plugin-undesirables"]
-}
-```
-
----
-
-## 🏃 Step 3: Run It!
-
-Simply start your ElizaOS framework like normal. It will automatically read your exact personality from the Workspace and format your Twitter/Discord interactions!
-```bash
-elizaos start --character your-character.json
-```
-
----
-
-## ⚠️ Common Idiot-Proof Diagnostics
-
-If your terminal crashes, stop and check here first:
-
-- **AssertionError: Workspace /path/ does not exist**
-  The plugin cannot find your downloaded soul. Make sure you extracted the `.zip` file, and that you pasted the *exact, full absolute path* into your `character.json`. If you are on Windows, make sure you double-escaped your slashes (e.g. `C:\\Users\\...`).
-  
-- **Invalid JSON Error**
-  Your `character.json` is missing a comma or has a syntax error. Use a real code editor like VS Code or Cursor to format your JSON properly instead of Notepad.
-
----
- 
-## What It Does (Architecture)
-
-Adds soul personality, market analysis, Business Pilot (23 modules), Meme Machine, and 23 skills to any ElizaOS agent.
-
-### Actions
-
-| Action | Trigger | Description |
-|--------|---------|-------------|
-| `UNDESIRABLE_MARKET_ANALYSIS` | "What do you think about ETH?" | Personality-driven market analysis with risk guardrails |
-| `UNDESIRABLE_BUSINESS_PILOT` | "Set up phone answering for my business" | 23 AI-powered business automation modules |
-| `UNDESIRABLE_MEME_MACHINE` | "Create memes for my barbershop" | Content creation, meme templates, industry packs |
-| `UNDESIRABLE_LOAD_SKILL` | "Check my portfolio" | Auto-matches and loads any of 23 skills |
-
-### Provider
-
-The `soulProvider` automatically injects the agent's personality context (archetype, strategy, adjectives, guardrails) into every single conversational response.
-
-## Converting Souls to character.json (Optional)
-
-If you don't want to use the Plugin abstraction layer above, you can force-convert a `.md` workspace directly into a massive monolithic `character.json` file using our companion converter script:
-```bash
-# Setup the MCP server repo and run:
-node soul-to-eliza.js --token 420
-```
-→ [undesirables-mcp-server](https://gitlab.com/meme-merchants/undesirables-mcp-server)
-
-## The Undesirables Ecosystem
-
-4,444 autonomous AI agents on Ethereum. Each one has a unique personality derived from its visual traits.
-
-- **Website**: [the-undesirables.com](https://the-undesirables.com)
-- **Mint**: [scatter.art/the-undesirables](https://scatter.art/the-undesirables)
-- **MCP Server**: [github.com/sailorpepe/undesirables-mcp-server](https://github.com/sailorpepe/undesirables-mcp-server) (Official MCP Registry)
-- **TCG Oracle Plugin**: [@undesirables/plugin-tcg-oracle](https://github.com/sailorpepe/elizaos-tcg-oracle-plugin)
-- **x402 API**: [oracle.the-undesirables.com](https://oracle.the-undesirables.com) (Coinbase Agentic Market)
-- **TCG Oracle Tools**: [pypi.org/project/tcg-oracle-tools](https://pypi.org/project/tcg-oracle-tools/)
-- **MCP on PyPI**: [pypi.org/project/undesirables-mcp-server](https://pypi.org/project/undesirables-mcp-server/)
-- **Kaggle Dataset**: [370K+ TCG products](https://www.kaggle.com/datasets/sailorpepe/tcg-market-intelligence)
-- **Contract**: [0xa893...17a](https://etherscan.io/token/0xa893648a701c03b14bf2fb767b72b2c55ed5c17a)
-
-EST. 2026 🐸
+[BUSL-1.1](LICENSE) — Business Source License 1.1. Copyright © 2026 The Undesirables LLC.
