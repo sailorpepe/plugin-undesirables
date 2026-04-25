@@ -200,8 +200,9 @@ describe("plugin-undesirables", () => {
 
   describe("Multi-Agent Safety", () => {
     it("should not use global mutable state", async () => {
-      // Verify that the source code uses a Map, not a global variable
-      const sourceCode = await fs.promises.readFile(
+      // Use actual fs to read source code (bypass mock)
+      const { readFileSync } = await vi.importActual<typeof import("fs")>("fs");
+      const sourceCode = readFileSync(
         path.join(__dirname, "index.ts"),
         "utf-8"
       );
