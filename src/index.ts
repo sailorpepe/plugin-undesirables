@@ -34,6 +34,7 @@ import type {
 import * as fs from "fs";
 import * as path from "path";
 import * as yaml from "js-yaml";
+import { validateUndesirableConfig } from "./environment.js";
 
 // ============================================================
 // Types
@@ -213,19 +214,26 @@ const marketAnalysisAction: Action = {
     "TRADING_VIEW",
     "WHAT_DO_YOU_THINK_ABOUT",
   ],
+  parameters: [
+    {
+      name: "asset",
+      description: "The token, coin, or market to analyze (e.g., 'ETH', 'BTC', 'SOL', 'DOGE')",
+      required: true,
+      schema: { type: "string" },
+    },
+  ],
   examples: [
     [
-      {
-        name: "{{user1}}",
-        content: { text: "What do you think about ETH right now?" },
-      } as ActionExample,
-      {
-        name: "{{agentName}}",
-        content: {
-          text: "Let me run my market analysis on ETH...",
-          action: "UNDESIRABLE_MARKET_ANALYSIS",
-        },
-      } as ActionExample,
+      { name: "{{user1}}", content: { text: "What do you think about ETH right now?" } } as ActionExample,
+      { name: "{{agentName}}", content: { text: "Let me run my market analysis on ETH...", action: "UNDESIRABLE_MARKET_ANALYSIS" } } as ActionExample,
+    ],
+    [
+      { name: "{{user1}}", content: { text: "Give me your take on Bitcoin" } } as ActionExample,
+      { name: "{{agentName}}", content: { text: "Analyzing BTC through my lens...", action: "UNDESIRABLE_MARKET_ANALYSIS" } } as ActionExample,
+    ],
+    [
+      { name: "{{user1}}", content: { text: "Is SOL a good buy here?" } } as ActionExample,
+      { name: "{{agentName}}", content: { text: "Running personality-driven analysis on SOL...", action: "UNDESIRABLE_MARKET_ANALYSIS" } } as ActionExample,
     ],
   ],
   validate: async (runtime: IAgentRuntime, _message: Memory) => {
@@ -267,19 +275,32 @@ const businessPilotAction: Action = {
     "SMS_AUTORESPONDER",
     "INVOICE_CHASER",
   ],
+  parameters: [
+    {
+      name: "business_type",
+      description: "The type of business to set up automation for (e.g., 'barbershop', 'restaurant', 'consulting')",
+      required: true,
+      schema: { type: "string" },
+    },
+    {
+      name: "module",
+      description: "Specific module to set up (e.g., 'phone answering', 'SMS', 'invoicing')",
+      required: false,
+      schema: { type: "string" },
+    },
+  ],
   examples: [
     [
-      {
-        name: "{{user1}}",
-        content: { text: "I run a barbershop. Help me set up phone answering." },
-      } as ActionExample,
-      {
-        name: "{{agentName}}",
-        content: {
-          text: "Loading Business Pilot skill for your barbershop...",
-          action: "UNDESIRABLE_BUSINESS_PILOT",
-        },
-      } as ActionExample,
+      { name: "{{user1}}", content: { text: "I run a barbershop. Help me set up phone answering." } } as ActionExample,
+      { name: "{{agentName}}", content: { text: "Loading Business Pilot skill for your barbershop...", action: "UNDESIRABLE_BUSINESS_PILOT" } } as ActionExample,
+    ],
+    [
+      { name: "{{user1}}", content: { text: "Set up automated SMS for my restaurant" } } as ActionExample,
+      { name: "{{agentName}}", content: { text: "Configuring SMS autoresponder for your restaurant...", action: "UNDESIRABLE_BUSINESS_PILOT" } } as ActionExample,
+    ],
+    [
+      { name: "{{user1}}", content: { text: "I need invoice automation for my freelance business" } } as ActionExample,
+      { name: "{{agentName}}", content: { text: "Setting up invoice chaser module...", action: "UNDESIRABLE_BUSINESS_PILOT" } } as ActionExample,
     ],
   ],
   validate: async (runtime: IAgentRuntime, _message: Memory) => {
@@ -322,19 +343,32 @@ const memeMachineAction: Action = {
     "VIRAL_CONTENT",
     "BRAND_VOICE",
   ],
+  parameters: [
+    {
+      name: "business_or_topic",
+      description: "The business, brand, or topic to create meme content for (e.g., 'barbershop', 'crypto', 'coffee shop')",
+      required: true,
+      schema: { type: "string" },
+    },
+    {
+      name: "platform",
+      description: "Target platform for the content (e.g., 'twitter', 'instagram', 'tiktok')",
+      required: false,
+      schema: { type: "string" },
+    },
+  ],
   examples: [
     [
-      {
-        name: "{{user1}}",
-        content: { text: "Create some memes for my barbershop" },
-      } as ActionExample,
-      {
-        name: "{{agentName}}",
-        content: {
-          text: "Firing up the Meme Machine for barbershop content...",
-          action: "UNDESIRABLE_MEME_MACHINE",
-        },
-      } as ActionExample,
+      { name: "{{user1}}", content: { text: "Create some memes for my barbershop" } } as ActionExample,
+      { name: "{{agentName}}", content: { text: "Firing up the Meme Machine for barbershop content...", action: "UNDESIRABLE_MEME_MACHINE" } } as ActionExample,
+    ],
+    [
+      { name: "{{user1}}", content: { text: "I need viral Twitter content for my coffee brand" } } as ActionExample,
+      { name: "{{agentName}}", content: { text: "Generating viral coffee brand content...", action: "UNDESIRABLE_MEME_MACHINE" } } as ActionExample,
+    ],
+    [
+      { name: "{{user1}}", content: { text: "Make me a content calendar for this week" } } as ActionExample,
+      { name: "{{agentName}}", content: { text: "Building your weekly content calendar...", action: "UNDESIRABLE_MEME_MACHINE" } } as ActionExample,
     ],
   ],
   validate: async (runtime: IAgentRuntime, _message: Memory) => {
@@ -379,19 +413,26 @@ const loadSkillAction: Action = {
     "ENTRY_SIGNAL",
     "EXIT_STRATEGY",
   ],
+  parameters: [
+    {
+      name: "skill_name",
+      description: "Name of the skill to load (e.g., 'check_portfolio', 'entry_signal', 'whale_tracker')",
+      required: false,
+      schema: { type: "string" },
+    },
+  ],
   examples: [
     [
-      {
-        name: "{{user1}}",
-        content: { text: "Check my portfolio" },
-      } as ActionExample,
-      {
-        name: "{{agentName}}",
-        content: {
-          text: "Loading portfolio check skill...",
-          action: "UNDESIRABLE_LOAD_SKILL",
-        },
-      } as ActionExample,
+      { name: "{{user1}}", content: { text: "Check my portfolio" } } as ActionExample,
+      { name: "{{agentName}}", content: { text: "Loading portfolio check skill...", action: "UNDESIRABLE_LOAD_SKILL" } } as ActionExample,
+    ],
+    [
+      { name: "{{user1}}", content: { text: "Should I ape into this token?" } } as ActionExample,
+      { name: "{{agentName}}", content: { text: "Running ape checklist analysis...", action: "UNDESIRABLE_LOAD_SKILL" } } as ActionExample,
+    ],
+    [
+      { name: "{{user1}}", content: { text: "What are whales buying right now?" } } as ActionExample,
+      { name: "{{agentName}}", content: { text: "Activating whale tracker skill...", action: "UNDESIRABLE_LOAD_SKILL" } } as ActionExample,
     ],
   ],
   validate: async (runtime: IAgentRuntime, _message: Memory) => {
@@ -540,6 +581,14 @@ const undesirablePlugin: Plugin = {
     "Pioneers 'Personality-as-Code' via verifiable soul workspaces. " +
     "Adds soul personality, market analysis, Business Pilot (23 modules), " +
     "Meme Machine, and 23 skills to any ElizaOS agent.",
+  init: async (config: Record<string, string>, runtime: IAgentRuntime) => {
+    const validation = validateUndesirableConfig(runtime);
+    if (!validation.valid) {
+      console.warn(`⚠️ Undesirables: ${validation.error}`);
+    } else {
+      console.log(`🐸 Undesirable soul workspace loaded: ${validation.workspacePath}`);
+    }
+  },
   actions: [
     marketAnalysisAction,
     businessPilotAction,

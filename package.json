@@ -5,6 +5,7 @@
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "type": "module",
+  "files": ["dist", "images", "plugin.json", "README.md", "LICENSE"],
   "scripts": {
     "build": "tsc",
     "clean": "rm -rf dist",
