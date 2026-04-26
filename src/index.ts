@@ -35,6 +35,8 @@ import * as fs from "fs";
 import * as path from "path";
 import * as yaml from "js-yaml";
 import { validateUndesirableConfig } from "./environment.js";
+import { riskToleranceEvaluator } from "./evaluators.js";
+import { MemeTrendService } from "./services.js";
 
 // ============================================================
 // Types
@@ -596,7 +598,8 @@ const undesirablePlugin: Plugin = {
     loadSkillAction,
   ],
   providers: [soulProvider],
-  evaluators: [],
+  evaluators: [riskToleranceEvaluator],
+  services: [MemeTrendService],
 };
 
 export default undesirablePlugin;
