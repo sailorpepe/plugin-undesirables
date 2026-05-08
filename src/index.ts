@@ -6,7 +6,7 @@
  *
  * Features:
  * - Load any of 4,444 unique soul personalities
- * - 23 unique skills across the collection (10 universal + 13 strategy-specific)
+ * - 34 unique tools across the collection
  * - Market analysis with personality-driven perspective
  * - Business Pilot — 23 AI-powered business modules
  * - Meme Machine — content creation & marketing
@@ -15,7 +15,7 @@
  * - Multi-agent safe (workspaces keyed by agentId)
  *
  * @see https://the-undesirables.com
- * @see https://gitlab.com/meme-merchants/undesirables-mcp-server
+ * @see https://github.com/sailorpepe/undesirables-mcp-server
  */
 
 import type {
@@ -250,7 +250,7 @@ const marketAnalysisAction: Action = {
     const workspace = getWorkspace(runtime);
     if (!workspace) {
       if (callback) await callback({ text: "No soul workspace loaded. Set UNDESIRABLES_WORKSPACE in your character.json settings." });
-      return { success: false, error: "No soul workspace loaded" };
+      return { success: false, text: "No soul workspace loaded", data: { resolution: "Set UNDESIRABLES_WORKSPACE env var to your downloaded workspace path" } };
     }
 
     const skill = workspace.skills["market_analysis"] || "";
@@ -404,7 +404,7 @@ const memeMachineAction: Action = {
 const loadSkillAction: Action = {
   name: "UNDESIRABLE_LOAD_SKILL",
   description:
-    "Load and execute any of the 23 skills from the Undesirable soul workspace — market analysis, content creation, portfolio check, entry signals, exit strategy, whale tracking, snipe evaluation, and more.",
+    "Load and execute any of the 34 tools from the Undesirable soul workspace — market analysis, content creation, portfolio check, entry signals, exit strategy, whale tracking, snipe evaluation, and more.",
   similes: [
     "USE_SKILL",
     "RUN_SKILL",
@@ -581,7 +581,7 @@ const undesirablePlugin: Plugin = {
     "The Undesirables — 4,444 autonomous AI agents on Ethereum. " +
     "Pioneers 'Personality-as-Code' via verifiable soul workspaces. " +
     "Adds soul personality, market analysis, Business Pilot (23 modules), " +
-    "Meme Machine, and 23 skills to any ElizaOS agent.",
+    "Meme Machine, and 34 tools to any ElizaOS agent.",
   init: async (config: Record<string, string>, runtime: IAgentRuntime) => {
     const validation = validateUndesirableConfig(runtime);
     if (!validation.valid) {
