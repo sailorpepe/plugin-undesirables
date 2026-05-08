@@ -3,6 +3,10 @@ import { Service, IAgentRuntime } from "@elizaos/core";
 export class MemeTrendService extends Service {
   static serviceType = "MEME_TREND_MONITOR";
 
+  get capabilityDescription(): string {
+    return "Monitors meme trends and content patterns for The Undesirables";
+  }
+
   static async start(runtime: IAgentRuntime): Promise<MemeTrendService> {
     const service = new MemeTrendService();
     await service.initialize(runtime);
