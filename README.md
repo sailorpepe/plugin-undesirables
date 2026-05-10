@@ -3,7 +3,11 @@
 ![The Undesirables Banner](./images/banner.jpg)
 
 [![npm version](https://img.shields.io/npm/v/plugin-undesirables.svg)](https://www.npmjs.org/package/plugin-undesirables)
+[![npm downloads](https://img.shields.io/npm/dw/plugin-undesirables.svg)](https://www.npmjs.org/package/plugin-undesirables)
 [![License: BUSL-1.1](https://img.shields.io/badge/License-BUSL--1.1-blue.svg)](LICENSE)
+[![ElizaOS](https://img.shields.io/badge/ElizaOS-v2_Compatible-purple.svg)](https://elizaos.ai)
+[![MCP Server](https://img.shields.io/badge/MCP_Server-34_Tools-green.svg)](https://github.com/sailorpepe/undesirables-mcp-server)
+[![x402](https://img.shields.io/badge/x402-Pay_Per_Request-orange.svg)](https://oracle.the-undesirables.com)
 
 > Give any ElizaOS agent a persistent personality, market analysis skills, business automation, and content creation — all driven by a downloadable "soul workspace."
 
@@ -17,8 +21,8 @@ When you install `plugin-undesirables`, your ElizaOS agent gets:
 
 - **A real personality** — not a system prompt hack, but a structured workspace with Big Five psychology scores, an archetype, a strategy style, adjectives, guardrails, and a backstory. The personality persists across sessions and colors every response.
 - **Market analysis with conviction** — your agent doesn't just parrot data. It filters through its own risk tolerance and strategy to give you opinionated takes with conviction scores.
-- **23 built-in skills** — portfolio checks, entry signals, exit strategies, whale tracking, meme creation, video production, music generation, and more. The agent auto-matches the right skill to your message.
-- **Business Pilot** — 23 AI-powered business automation modules: phone answering, SMS autoresponders, invoice chasers, appointment scheduling. Your agent becomes a business operations assistant.
+- **24 built-in skills** — portfolio checks, entry signals, exit strategies, whale tracking, meme creation, video production, music generation, and more. The agent auto-matches the right skill to your message.
+- **Business Pilot** — AI-powered business automation modules: phone answering, SMS autoresponders, invoice chasers, appointment scheduling. Your agent becomes a business operations assistant.
 - **Meme Machine** — content creation, brand voice setup, content calendars, and industry-specific meme packs. Your agent becomes a social media manager.
 
 ---
@@ -40,7 +44,7 @@ Each workspace contains:
 - `SYSTEM_PROMPT.txt` — the full instruction set
 - `MEMORY.md` — persistent memory file
 - `PREDICTIONS_LEDGER.json` — track record of market calls
-- `skills/` — 10-23 skill files depending on the agent's traits
+- `skills/` — 10-24 skill files depending on the agent's traits
 
 ### 3. Configure
 
@@ -83,9 +87,9 @@ Your agent now has a persistent personality that influences every conversation.
 | `UNDESIRABLE_MARKET_ANALYSIS` | "What do you think about ETH?" | Personality-driven market analysis with risk guardrails and conviction scoring |
 | `UNDESIRABLE_BUSINESS_PILOT` | "Set up phone answering for my barbershop" | Loads the Business Pilot skill, recommends top modules with setup steps |
 | `UNDESIRABLE_MEME_MACHINE` | "Create memes for my coffee shop" | Generates meme concepts, captions, content calendars, brand voice |
-| `UNDESIRABLE_LOAD_SKILL` | "Check my portfolio" / "Should I ape?" | Auto-matches your message to one of 23 skills and executes it |
+| `UNDESIRABLE_LOAD_SKILL` | "Check my portfolio" / "Should I ape?" | Auto-matches your message to one of 24 skills and executes it |
 
-### All 23 Skills
+### All 24 Skills
 
 | Skill | Trigger Words |
 |-------|--------------|
@@ -109,6 +113,7 @@ Your agent now has a persistent personality that influences every conversation.
 | Rebalance Check | "rebalance", "allocation", "portfolio drift" |
 | Diversification | "diversify", "spread", "concentrate" |
 | Sector Rotation | "sector", "rotation", "cycle" |
+| Prediction Log | "predict", "forecast", "call" |
 | Image Generation | "image", "picture", "generate art" |
 | Music Generation | "music", "song", "beat" |
 | Video Production | "video", "promo", "render video" |
@@ -164,11 +169,31 @@ Workspaces are keyed by `runtime.agentId`. You can run multiple Undesirable agen
 
 ---
 
-## Related Projects
+## Ecosystem
 
-- [@undesirables/plugin-tcg-oracle](https://github.com/sailorpepe/elizaos-tcg-oracle-plugin) — Trading card market intelligence (search, grade, simulate)
-- [undesirables-mcp-server](https://github.com/sailorpepe/undesirables-mcp-server) — 34-tool MCP server (Glama Registry, PyPI)
-- [the-undesirables.com](https://the-undesirables.com) — The Undesirables NFT collection
+### Plugins
+- [plugin-undesirables](https://www.npmjs.com/package/plugin-undesirables) — Soul personality + business tools (this package)
+- [@undesirables/plugin-tcg-oracle](https://github.com/sailorpepe/elizaos-tcg-oracle-plugin) — TCG market intelligence (search, grade, simulate)
+
+### Servers & APIs
+- [MCP Server](https://github.com/sailorpepe/undesirables-mcp-server) — 34-tool MCP server ([PyPI](https://pypi.org/project/undesirables-mcp-server/) · [Glama](https://glama.ai/mcp/servers/sailorpepe/undesirables-mcp-server) · [Official Registry](https://registry.modelcontextprotocol.io))
+- [x402 Oracle API](https://oracle.the-undesirables.com) — Pay-per-request TCG + prediction market intelligence ([Swagger](https://oracle.the-undesirables.com/docs))
+
+### Apps
+- [TCG Oracle Desktop](https://github.com/sailorpepe/tcg-oracle-app) — macOS / Linux / Windows desktop app with AI card grading
+- [Desktop Installer](https://github.com/sailorpepe/undesirables-desktop/releases/tag/v1.3.0) — DMG, DEB, RPM, AppImage, MSI binaries
+- [TCG Oracle Tools](https://pypi.org/project/tcg-oracle-tools/) — Python SDK for the Oracle API
+
+### Data & Research
+- [Kaggle Dataset](https://www.kaggle.com/datasets/sailorpepe/tcg-market-intelligence) — 370K+ TCG products across 25 games
+- [HuggingFace Space](https://huggingface.co/spaces/sailorpepe/tcg-oracle) — Live demo
+- [Dev.to Tutorial](https://dev.to/sailor_pepe_7920f552c5b9a/build-an-autonomous-pokemon-card-trading-agent-with-ai-grading-monte-carlo-pricing-2b86) — Build guide
+
+### Collection
+- [The Undesirables](https://the-undesirables.com) — 4,444 NFTs on Ethereum
+- [Soul Workspace](https://the-undesirables.com/soul) — Download your agent's personality
+- [Etherscan](https://etherscan.io/address/0xa893648a701c03b14bf2fb767b72b2c55ed5c17a) — Contract
+- [Scatter.art](https://scatter.art/the-undesirables) — Mint page
 
 ---
 
