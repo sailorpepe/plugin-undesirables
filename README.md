@@ -167,7 +167,7 @@ Workspaces are keyed by `runtime.agentId`. You can run multiple Undesirable agen
 ## Related Projects
 
 - [@undesirables/plugin-tcg-oracle](https://github.com/sailorpepe/elizaos-tcg-oracle-plugin) — Trading card market intelligence (search, grade, simulate)
-- [undesirables-mcp-server](https://github.com/sailorpepe/undesirables-mcp-server) — 36-tool MCP server (Glama Registry, PyPI)
+- [undesirables-mcp-server](https://github.com/sailorpepe/undesirables-mcp-server) — 34-tool MCP server (Glama Registry, PyPI)
 - [the-undesirables.com](https://the-undesirables.com) — The Undesirables NFT collection
 
 ---
