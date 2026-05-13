@@ -516,6 +516,273 @@ const loadSkillAction: Action = {
 };
 
 // ============================================================
+// DEDICATED SKILL ACTIONS (v2.1.0)
+// Top 5 most-requested skills broken into first-class actions
+// for better discoverability and routing.
+// ============================================================
+
+const whaleTrackerAction: Action = {
+  name: "UNDESIRABLE_WHALE_TRACKER",
+  description:
+    "Track whale wallet movements, smart money flows, and large institutional buys/sells across DeFi protocols.",
+  similes: [
+    "WHALE_WATCH",
+    "SMART_MONEY",
+    "BIG_WALLETS",
+    "INSTITUTIONAL_FLOW",
+    "WHALE_MOVEMENTS",
+  ],
+  parameters: [
+    {
+      name: "asset",
+      description: "Token or protocol to track whale activity for (e.g., 'ETH', 'ARB', 'AAVE')",
+      required: false,
+      schema: { type: "string" },
+    },
+  ],
+  examples: [
+    [
+      { name: "{{user1}}", content: { text: "What are whales buying right now?" } } as ActionExample,
+      { name: "{{agentName}}", content: { text: "Scanning whale wallets for recent accumulation...", action: "UNDESIRABLE_WHALE_TRACKER" } } as ActionExample,
+    ],
+    [
+      { name: "{{user1}}", content: { text: "Show me smart money flows for ETH" } } as ActionExample,
+      { name: "{{agentName}}", content: { text: "Tracking institutional ETH flows...", action: "UNDESIRABLE_WHALE_TRACKER" } } as ActionExample,
+    ],
+  ],
+  validate: async (runtime: IAgentRuntime, _message: Memory) => {
+    return getWorkspace(runtime) !== null;
+  },
+  handler: async (
+    runtime: IAgentRuntime,
+    message: Memory,
+    _state?: State,
+    _options?: Record<string, unknown>,
+    callback?: HandlerCallback
+  ): Promise<ActionResult | undefined> => {
+    const workspace = getWorkspace(runtime);
+    if (!workspace) {
+      if (callback) await callback({ text: "No soul workspace loaded." });
+      return { success: false, error: "No soul workspace loaded" };
+    }
+    const skill = workspace.skills["whale_tracker"] || "";
+    const context = buildSkillContext(skill, workspace, message.content.text || "",
+      "Identify the top 3-5 whale movements with wallet addresses, amounts, and your conviction on whether to follow.");
+    return generateResponse(runtime, context, callback, "UNDESIRABLE_WHALE_TRACKER");
+  },
+};
+
+const entrySignalAction: Action = {
+  name: "UNDESIRABLE_ENTRY_SIGNAL",
+  description:
+    "Analyze whether now is a good time to enter a position. Evaluates price action, momentum, support/resistance, and risk/reward ratio through the agent's personality lens.",
+  similes: [
+    "BUY_SIGNAL",
+    "SHOULD_I_BUY",
+    "ENTRY_POINT",
+    "GOOD_TIME_TO_BUY",
+    "ACCUMULATE",
+  ],
+  parameters: [
+    {
+      name: "asset",
+      description: "Token to evaluate entry for (e.g., 'ETH', 'BTC', 'SOL')",
+      required: true,
+      schema: { type: "string" },
+    },
+  ],
+  examples: [
+    [
+      { name: "{{user1}}", content: { text: "Is now a good time to buy ETH?" } } as ActionExample,
+      { name: "{{agentName}}", content: { text: "Running entry signal analysis on ETH...", action: "UNDESIRABLE_ENTRY_SIGNAL" } } as ActionExample,
+    ],
+    [
+      { name: "{{user1}}", content: { text: "Should I accumulate SOL here?" } } as ActionExample,
+      { name: "{{agentName}}", content: { text: "Evaluating SOL entry conditions...", action: "UNDESIRABLE_ENTRY_SIGNAL" } } as ActionExample,
+    ],
+  ],
+  validate: async (runtime: IAgentRuntime, _message: Memory) => {
+    return getWorkspace(runtime) !== null;
+  },
+  handler: async (
+    runtime: IAgentRuntime,
+    message: Memory,
+    _state?: State,
+    _options?: Record<string, unknown>,
+    callback?: HandlerCallback
+  ): Promise<ActionResult | undefined> => {
+    const workspace = getWorkspace(runtime);
+    if (!workspace) {
+      if (callback) await callback({ text: "No soul workspace loaded." });
+      return { success: false, error: "No soul workspace loaded" };
+    }
+    const skill = workspace.skills["entry_signal"] || "";
+    const context = buildSkillContext(skill, workspace, message.content.text || "",
+      "Provide a clear GO / WAIT / NO-GO entry signal with price levels, risk/reward ratio, and conviction score.");
+    return generateResponse(runtime, context, callback, "UNDESIRABLE_ENTRY_SIGNAL");
+  },
+};
+
+const portfolioCheckAction: Action = {
+  name: "UNDESIRABLE_PORTFOLIO_CHECK",
+  description:
+    "Review portfolio health, diversification, risk exposure, and performance. Applies the agent's risk guardrails and personality-driven perspective.",
+  similes: [
+    "CHECK_PORTFOLIO",
+    "PORTFOLIO_REVIEW",
+    "HOW_AM_I_DOING",
+    "PORTFOLIO_HEALTH",
+    "HOLDINGS_CHECK",
+  ],
+  parameters: [
+    {
+      name: "portfolio_description",
+      description: "Description of current holdings (e.g., '50% ETH, 30% BTC, 20% stablecoins')",
+      required: false,
+      schema: { type: "string" },
+    },
+  ],
+  examples: [
+    [
+      { name: "{{user1}}", content: { text: "How does my portfolio look?" } } as ActionExample,
+      { name: "{{agentName}}", content: { text: "Running portfolio health check...", action: "UNDESIRABLE_PORTFOLIO_CHECK" } } as ActionExample,
+    ],
+    [
+      { name: "{{user1}}", content: { text: "Am I too concentrated in ETH?" } } as ActionExample,
+      { name: "{{agentName}}", content: { text: "Analyzing your ETH concentration risk...", action: "UNDESIRABLE_PORTFOLIO_CHECK" } } as ActionExample,
+    ],
+  ],
+  validate: async (runtime: IAgentRuntime, _message: Memory) => {
+    return getWorkspace(runtime) !== null;
+  },
+  handler: async (
+    runtime: IAgentRuntime,
+    message: Memory,
+    _state?: State,
+    _options?: Record<string, unknown>,
+    callback?: HandlerCallback
+  ): Promise<ActionResult | undefined> => {
+    const workspace = getWorkspace(runtime);
+    if (!workspace) {
+      if (callback) await callback({ text: "No soul workspace loaded." });
+      return { success: false, error: "No soul workspace loaded" };
+    }
+    const skill = workspace.skills["check_portfolio"] || "";
+    const context = buildSkillContext(skill, workspace, message.content.text || "",
+      "Evaluate portfolio health against your risk guardrails. Flag concentration risks, suggest rebalancing, and rate overall health A-F.");
+    return generateResponse(runtime, context, callback, "UNDESIRABLE_PORTFOLIO_CHECK");
+  },
+};
+
+const exitStrategyAction: Action = {
+  name: "UNDESIRABLE_EXIT_STRATEGY",
+  description:
+    "Plan exit strategy for a position — take profit levels, stop losses, trailing stops, and time-based exits based on the agent's trading personality.",
+  similes: [
+    "TAKE_PROFIT",
+    "STOP_LOSS",
+    "WHEN_TO_SELL",
+    "EXIT_PLAN",
+    "SELL_SIGNAL",
+  ],
+  parameters: [
+    {
+      name: "asset",
+      description: "Token to plan exit for (e.g., 'ETH', 'BTC')",
+      required: true,
+      schema: { type: "string" },
+    },
+    {
+      name: "entry_price",
+      description: "Price at which the position was entered",
+      required: false,
+      schema: { type: "number" },
+    },
+  ],
+  examples: [
+    [
+      { name: "{{user1}}", content: { text: "When should I sell my ETH?" } } as ActionExample,
+      { name: "{{agentName}}", content: { text: "Building exit strategy for your ETH position...", action: "UNDESIRABLE_EXIT_STRATEGY" } } as ActionExample,
+    ],
+    [
+      { name: "{{user1}}", content: { text: "Set up take profit and stop loss for BTC" } } as ActionExample,
+      { name: "{{agentName}}", content: { text: "Planning BTC exit levels...", action: "UNDESIRABLE_EXIT_STRATEGY" } } as ActionExample,
+    ],
+  ],
+  validate: async (runtime: IAgentRuntime, _message: Memory) => {
+    return getWorkspace(runtime) !== null;
+  },
+  handler: async (
+    runtime: IAgentRuntime,
+    message: Memory,
+    _state?: State,
+    _options?: Record<string, unknown>,
+    callback?: HandlerCallback
+  ): Promise<ActionResult | undefined> => {
+    const workspace = getWorkspace(runtime);
+    if (!workspace) {
+      if (callback) await callback({ text: "No soul workspace loaded." });
+      return { success: false, error: "No soul workspace loaded" };
+    }
+    const skill = workspace.skills["exit_strategy"] || "";
+    const context = buildSkillContext(skill, workspace, message.content.text || "",
+      "Provide specific take profit levels (TP1, TP2, TP3), stop loss placement, and time-based exit rules based on your trading personality.");
+    return generateResponse(runtime, context, callback, "UNDESIRABLE_EXIT_STRATEGY");
+  },
+};
+
+const riskAssessmentAction: Action = {
+  name: "UNDESIRABLE_RISK_ASSESSMENT",
+  description:
+    "Deep risk analysis on a token, protocol, or trade setup. Evaluates smart contract risk, liquidity risk, volatility, and overall safety rating.",
+  similes: [
+    "IS_THIS_SAFE",
+    "RISK_CHECK",
+    "ASSESS_RISK",
+    "HOW_RISKY",
+    "SECURITY_CHECK",
+  ],
+  parameters: [
+    {
+      name: "target",
+      description: "Token, protocol, or trade to assess risk for (e.g., 'AAVE', 'this new memecoin', 'leveraged ETH')",
+      required: true,
+      schema: { type: "string" },
+    },
+  ],
+  examples: [
+    [
+      { name: "{{user1}}", content: { text: "Is this new memecoin safe to ape into?" } } as ActionExample,
+      { name: "{{agentName}}", content: { text: "Running risk assessment...", action: "UNDESIRABLE_RISK_ASSESSMENT" } } as ActionExample,
+    ],
+    [
+      { name: "{{user1}}", content: { text: "What's the risk on leveraged ETH?" } } as ActionExample,
+      { name: "{{agentName}}", content: { text: "Evaluating leveraged ETH risk profile...", action: "UNDESIRABLE_RISK_ASSESSMENT" } } as ActionExample,
+    ],
+  ],
+  validate: async (runtime: IAgentRuntime, _message: Memory) => {
+    return getWorkspace(runtime) !== null;
+  },
+  handler: async (
+    runtime: IAgentRuntime,
+    message: Memory,
+    _state?: State,
+    _options?: Record<string, unknown>,
+    callback?: HandlerCallback
+  ): Promise<ActionResult | undefined> => {
+    const workspace = getWorkspace(runtime);
+    if (!workspace) {
+      if (callback) await callback({ text: "No soul workspace loaded." });
+      return { success: false, error: "No soul workspace loaded" };
+    }
+    const skill = workspace.skills["risk_assessment"] || "";
+    const context = buildSkillContext(skill, workspace, message.content.text || "",
+      "Provide a risk rating (1-10), identify top 3 risk factors, and give a clear SAFE / CAUTION / DANGER verdict with reasoning.");
+    return generateResponse(runtime, context, callback, "UNDESIRABLE_RISK_ASSESSMENT");
+  },
+};
+
+// ============================================================
 // PROVIDERS
 // ============================================================
 
@@ -581,7 +848,8 @@ const undesirablePlugin: Plugin = {
     "The Undesirables — 4,444 autonomous AI agents on Ethereum. " +
     "Pioneers 'Personality-as-Code' via verifiable soul workspaces. " +
     "Adds soul personality, market analysis, Business Pilot (23 modules), " +
-    "Meme Machine, and 34 tools to any ElizaOS agent.",
+    "Meme Machine, whale tracking, entry signals, portfolio checks, " +
+    "exit strategies, risk assessment, and 34 tools to any ElizaOS agent.",
   init: async (config: Record<string, string>, runtime: IAgentRuntime) => {
     const validation = validateUndesirableConfig(runtime);
     if (!validation.valid) {
@@ -595,6 +863,11 @@ const undesirablePlugin: Plugin = {
     businessPilotAction,
     memeMachineAction,
     loadSkillAction,
+    whaleTrackerAction,
+    entrySignalAction,
+    portfolioCheckAction,
+    exitStrategyAction,
+    riskAssessmentAction,
   ],
   providers: [soulProvider],
   evaluators: [],

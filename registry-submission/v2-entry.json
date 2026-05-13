@@ -1,0 +1,31 @@
+{
+  "package": "plugin-undesirables",
+  "repository": "github:sailorpepe/plugin-undesirables",
+  "kind": "plugin",
+  "description": "ElizaOS plugin: Personality-as-Code via NFT soul workspaces. 4,444 AI agents on Ethereum. Market analysis, Business Pilot, Meme Machine, and 34 tools.",
+  "homepage": "https://the-undesirables.com",
+  "version": "2.0.3",
+  "tags": [
+    "elizaos",
+    "elizaos-plugins",
+    "ai-agents",
+    "nft",
+    "ethereum",
+    "undesirables",
+    "mcp",
+    "ollama",
+    "autonomous-agents",
+    "defi",
+    "personality",
+    "soul",
+    "byos",
+    "x402",
+    "trading-cards",
+    "tcg",
+    "coinbase",
+    "base",
+    "usdc",
+    "content-creation",
+    "business-automation"
+  ]
+}
