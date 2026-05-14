@@ -1,6 +1,6 @@
 {
   "name": "plugin-undesirables",
-  "version": "2.1.0",
+  "version": "2.1.1",
   "description": "ElizaOS plugin: Personality-as-Code via NFT soul workspaces. 4,444 AI agents on Ethereum. Market analysis, Business Pilot, Meme Machine, and 34 tools.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
