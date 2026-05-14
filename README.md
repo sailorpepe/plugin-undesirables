@@ -7,6 +7,7 @@
 [![License: BUSL-1.1](https://img.shields.io/badge/License-BUSL--1.1-blue.svg)](LICENSE)
 [![ElizaOS](https://img.shields.io/badge/ElizaOS-v2_Compatible-purple.svg)](https://elizaos.ai)
 [![MCP Server](https://img.shields.io/badge/MCP_Server-34_Tools-green.svg)](https://github.com/sailorpepe/undesirables-mcp-server)
+[![Actions](https://img.shields.io/badge/Actions-9_Total-brightgreen.svg)](https://www.npmjs.org/package/plugin-undesirables)
 [![x402](https://img.shields.io/badge/x402-Pay_Per_Request-orange.svg)](https://oracle.the-undesirables.com)
 
 > Give any ElizaOS agent a persistent personality, market analysis skills, business automation, and content creation — all driven by a downloadable "soul workspace."
@@ -80,7 +81,9 @@ Your agent now has a persistent personality that influences every conversation.
 
 ---
 
-## Actions
+## Actions (9 Total)
+
+### Core Actions
 
 | Action | Trigger Examples | What Happens |
 |--------|-----------------|--------------|
@@ -88,6 +91,16 @@ Your agent now has a persistent personality that influences every conversation.
 | `UNDESIRABLE_BUSINESS_PILOT` | "Set up phone answering for my barbershop" | Loads the Business Pilot skill, recommends top modules with setup steps |
 | `UNDESIRABLE_MEME_MACHINE` | "Create memes for my coffee shop" | Generates meme concepts, captions, content calendars, brand voice |
 | `UNDESIRABLE_LOAD_SKILL` | "Check my portfolio" / "Should I ape?" | Auto-matches your message to one of 24 skills and executes it |
+
+### Dedicated Trading Actions (NEW in v2.1.0)
+
+| Action | Trigger Examples | What Happens |
+|--------|-----------------|--------------|
+| `UNDESIRABLE_WHALE_TRACKER` | "What are whales buying?" / "Smart money flows" | Tracks whale wallet movements, institutional buys/sells, and smart money flows |
+| `UNDESIRABLE_ENTRY_SIGNAL` | "Is now a good time to buy ETH?" / "Buy signal" | Evaluates price action, momentum, support/resistance — returns GO / WAIT / NO-GO |
+| `UNDESIRABLE_PORTFOLIO_CHECK` | "How does my portfolio look?" / "Am I diversified?" | Reviews portfolio health, concentration risk, and grades it A-F against guardrails |
+| `UNDESIRABLE_EXIT_STRATEGY` | "When should I sell my ETH?" / "Set up take profit" | Plans TP1/TP2/TP3 levels, stop loss placement, and time-based exit rules |
+| `UNDESIRABLE_RISK_ASSESSMENT` | "Is this memecoin safe?" / "How risky is leveraged ETH?" | Deep risk analysis — returns SAFE / CAUTION / DANGER with top 3 risk factors |
 
 ### All 24 Skills
 
@@ -157,6 +170,13 @@ Workspaces are keyed by `runtime.agentId`. You can run multiple Undesirable agen
 | `No soul workspace loaded` | The `UNDESIRABLES_WORKSPACE` setting is missing or the path doesn't exist. |
 
 ---
+
+## What's New in v2.1.0
+
+- **5 new dedicated trading actions** — whale tracking, entry signals, portfolio checks, exit strategies, and risk assessment are now first-class actions (previously bundled in the generic `LOAD_SKILL` action)
+- **Better discoverability** — ElizaOS can now route directly to the right action without keyword matching
+- **Richer responses** — each action has specialized instructions (GO/WAIT/NO-GO for entries, A-F grades for portfolios, SAFE/CAUTION/DANGER for risk)
+- **9 total actions** (was 4)
 
 ## What's New in v2.0
 
