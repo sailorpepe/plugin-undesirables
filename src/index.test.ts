@@ -8,6 +8,7 @@ vi.mock("fs", async () => {
   return {
     ...actual,
     existsSync: vi.fn(),
+    realpathSync: vi.fn((p: string) => p),
     promises: {
       readFile: vi.fn(),
       readdir: vi.fn(),
