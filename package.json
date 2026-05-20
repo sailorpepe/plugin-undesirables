@@ -1,13 +1,23 @@
 {
   "name": "plugin-undesirables",
-  "version": "2.1.1",
+  "version": "2.2.0",
   "description": "ElizaOS plugin: Persistent personality via NFT soul workspaces. 4,444 unique AI agents on Ethereum with Big Five psychology, market analysis, Business Pilot, Meme Machine, and 24 skills.",
   "main": "dist/index.js",
+  "module": "dist/index.js",
   "types": "dist/index.d.ts",
   "type": "module",
+  "exports": {
+    "./package.json": "./package.json",
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
+    }
+  },
   "files": [
     "dist",
     "images",
+    "assets",
     "plugin.json",
     "README.md",
     "CHANGELOG.md",
@@ -51,6 +61,38 @@
   "funding": {
     "type": "individual",
     "url": "https://the-undesirables.com"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "agentConfig": {
+    "pluginType": "elizaos:plugin:1.0.0",
+    "pluginParameters": {
+      "UNDESIRABLES_WORKSPACE": {
+        "type": "string",
+        "description": "Path to the downloaded Undesirables soul workspace directory (contains SOUL.md, SYSTEM_PROMPT.txt, skills/)",
+        "required": true,
+        "sensitive": false
+      },
+      "OLLAMA_BASE_URL": {
+        "type": "string",
+        "description": "Ollama endpoint URL for local LLM inference (default: http://localhost:11434)",
+        "required": false,
+        "default": "http://localhost:11434",
+        "sensitive": false
+      }
+    }
+  },
+  "elizaos": {
+    "plugin": {
+      "capabilities": [
+        "personality",
+        "market-analysis",
+        "business-automation",
+        "content-creation",
+        "risk-assessment"
+      ]
+    }
   },
   "peerDependencies": {
     "@elizaos/core": ">=1.0.0"
