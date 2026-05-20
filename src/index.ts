@@ -49,7 +49,7 @@ const ORACLE_BASE_URL = "https://oracle.the-undesirables.com";
 const ORACLE_SEARCH_ENDPOINT = `${ORACLE_BASE_URL}/api/v1/search`;
 const ORACLE_MARKET_ENDPOINT = `${ORACLE_BASE_URL}/api/v1/market`;
 const SCATTER_MINT_URL = "https://scatter.art/the-undesirables";
-const PLUGIN_VERSION = "2.4.1";
+const PLUGIN_VERSION = "2.4.3";
 const COLLECTION_TOTAL = 4444;
 const MINTED_COUNT = 273;
 
