@@ -1,0 +1,59 @@
+{
+  "_description": "Live Oracle API responses captured May 20, 2026",
+  "root_endpoint": {
+    "url": "https://oracle.the-undesirables.com/",
+    "response": {
+      "name": "The Undesirables — AI Tools API",
+      "version": "1.0.0",
+      "x402_enabled": true,
+      "payment_address": "0x642e8a7C289381f24f0395e0539f0bA41c74Cc1B",
+      "network": "eip155:8453",
+      "endpoints": {
+        "free": [
+          {"path": "/api/v1/search", "description": "Search 370K+ TCG products"},
+          {"path": "/api/v1/market", "description": "Daily market snapshot"}
+        ],
+        "paid": [
+          {"path": "/api/v1/grade", "price": "$0.10", "description": "AI card grading (PSA/Beckett)"},
+          {"path": "/api/v1/simulate", "price": "$0.015", "description": "Monte Carlo price simulation (Heston/Merton/Kou)"},
+          {"path": "/api/v1/crypto-oracle", "price": "$0.05", "description": "NFT floor + Monte Carlo"},
+          {"path": "/api/v1/coin-history", "price": "$0.05", "description": "Token price simulation"},
+          {"path": "/api/v1/arb-cross", "price": "$1.00", "description": "Kalshi/Polymarket arbitrage"},
+          {"path": "/api/v1/arb-basket", "price": "$0.50", "description": "Multi-outcome basket arb"},
+          {"path": "/api/v1/arb-weather", "price": "$0.25", "description": "Weather derivatives edge"}
+        ]
+      }
+    }
+  },
+  "search_example": {
+    "url": "/api/v1/search?query=charizard&limit=3",
+    "response": {
+      "status": "ok",
+      "query": "charizard",
+      "data": {
+        "results": [
+          {"product_id": 454377, "name": "Sword & Shield Ultra-Premium Collection: Charizard Case", "market_price": 1934.38, "low_price": 2100.00, "mid_price": 2694.85, "high_price": 3000.00, "price_date": "2026-05-04"},
+          {"product_id": 84198, "name": "Charizard Star (Delta Species)", "market_price": 1653.33, "low_price": 15000.00, "mid_price": 15000.00, "high_price": 15000.00, "price_date": "2026-05-04"},
+          {"product_id": 84193, "name": "Charizard", "market_price": 1075.00, "low_price": 699.98, "mid_price": 19997.00, "high_price": 19999.99, "price_date": "2026-05-04"}
+        ],
+        "total": 3
+      }
+    }
+  },
+  "market_example": {
+    "url": "/api/v1/market",
+    "response": {
+      "status": "ok",
+      "game": "Pokemon",
+      "data": {
+        "total_products": 31861,
+        "with_pricing": 28880,
+        "top_cards": [
+          {"name": "Pokemon Base Set (Shadowless) [1st Edition] Booster Pack", "market_price": 15000.00, "date": "2026-05-04"},
+          {"name": "Evolving Skies Booster Box Case", "market_price": 14847.15, "date": "2026-05-04"},
+          {"name": "Team Up Booster Box", "market_price": 10941.94, "date": "2026-05-04"}
+        ]
+      }
+    }
+  }
+}
