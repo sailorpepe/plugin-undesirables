@@ -16,15 +16,15 @@
 
 ## What This Does
 
-Most AI agents are blank slates. They answer questions but have no personality, no memory, no conviction. This plugin changes that.
+Each of the 4,444 NFTs in [The Undesirables](https://the-undesirables.com) collection has a downloadable "soul workspace" — a structured personality profile with Big Five psychology scores, an archetype, a strategy style, guardrails, and a backstory. This plugin loads that workspace and injects the personality into every ElizaOS agent response.
 
-When you install `plugin-undesirables`, your ElizaOS agent gets:
+When you install `plugin-undesirables`, your agent gets:
 
-- **A real personality** — not a system prompt hack, but a structured workspace with Big Five psychology scores, an archetype, a strategy style, adjectives, guardrails, and a backstory. The personality persists across sessions and colors every response.
-- **Market analysis with conviction** — your agent doesn't just parrot data. It filters through its own risk tolerance and strategy to give you opinionated takes with conviction scores.
-- **24 built-in skills** — portfolio checks, entry signals, exit strategies, whale tracking, meme creation, video production, music generation, and more. The agent auto-matches the right skill to your message.
-- **Business Pilot** — AI-powered business automation modules: phone answering, SMS autoresponders, invoice chasers, appointment scheduling. Your agent becomes a business operations assistant.
-- **Meme Machine** — content creation, brand voice setup, content calendars, and industry-specific meme packs. Your agent becomes a social media manager.
+- **Persistent personality** — structured workspace data (not a system prompt) with Big Five scores, an archetype, strategy, adjectives, guardrails, and backstory. Persists across sessions and colors every response.
+- **Market analysis with conviction** — filters market data through the agent's own risk tolerance and strategy. Returns opinionated takes with conviction scores.
+- **24 built-in skills** — portfolio checks, entry signals, exit strategies, whale tracking, meme creation, video production, music generation, and more. Auto-matches the right skill to your message.
+- **Business Pilot** — phone answering, SMS autoresponders, invoice chasers, appointment scheduling. Turn your agent into a business operations assistant.
+- **Meme Machine** — content creation, brand voice setup, content calendars, and industry-specific meme packs. Turn your agent into a social media manager.
 
 ---
 
