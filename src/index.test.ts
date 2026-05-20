@@ -176,13 +176,18 @@ describe("plugin-undesirables", () => {
       expect(names).toContain("UNDESIRABLE_LOAD_SKILL");
     });
 
-    it("should have a named provider", async () => {
+    it("should have named providers", async () => {
       const plugin = (await import("./index.js")).default;
-      const provider = plugin.providers![0];
+      const providerNames = plugin.providers!.map((p) => p.name);
 
-      expect(provider.name).toBe("undesirables-soul");
-      expect(provider.description).toBeTruthy();
-      expect(typeof provider.get).toBe("function");
+      expect(plugin.providers!.length).toBe(2);
+      expect(providerNames).toContain("undesirables-oracle");
+      expect(providerNames).toContain("undesirables-soul");
+
+      for (const provider of plugin.providers!) {
+        expect(provider.description).toBeTruthy();
+        expect(typeof provider.get).toBe("function");
+      }
     });
 
     it("actions should have examples with name field (v2 format)", async () => {
