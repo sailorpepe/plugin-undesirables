@@ -46,7 +46,7 @@ The Undesirables ecosystem has three tiers. The plugin is the free entry point.
 │  Paid — x402 micropayments, USDC on Base                 │
 │                                                          │
 │  $0.10  AI card grading (PSA/Beckett via vision model)   │
-│  $0.015 Monte Carlo price simulation (Heston/Merton/Kou) │
+│  $0.015 Monte Carlo price simulation (Merton Jump-Diffusion) │
 │  $0.05  NFT floor price oracle + forecast                │
 │  $0.05  Token price simulation (CoinGecko + Monte Carlo) │
 │  $1.00  Cross-platform prediction market arbitrage       │
