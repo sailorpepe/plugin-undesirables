@@ -15,13 +15,13 @@
 
 ## What This Does
 
-`plugin-undesirables` gives any ElizaOS agent a structured personality, live TCG market data, and 24 specialized skills — with zero configuration required.
+`plugin-undesirables` gives any ElizaOS agent a structured personality, live market data from multiple free APIs, and 16 specialized skills — with zero configuration required.
 
 Install the plugin, and your agent immediately gets:
 
 - **A working personality** — a demo soul loads automatically. NFT holders get their unique AI identity.
-- **Live market data** — real product prices from 370K+ indexed TCG products, injected into every relevant conversation.
-- **24 skills** — market analysis, portfolio checks, entry signals, exit strategies, risk assessment, content creation, and more.
+- **Live market data** — real product prices from 370K+ indexed TCG products, DeFi yields from DeFiLlama, on-chain balances from Etherscan.
+- **16 live-data skills** — market analysis, portfolio checks, entry signals, exit strategies, risk assessment, yield farming, content creation, and more. All financial skills fetch real data.
 - **Passive market intelligence** — an evaluator that detects card/market topics and enriches the agent's context with live pricing data automatically.
 
 ---
@@ -36,7 +36,7 @@ The Undesirables ecosystem has three tiers. The plugin is the free entry point.
 │  Free — no keys, no wallets, no payments                 │
 │                                                          │
 │  ✓ Demo soul (loads automatically, zero config)          │
-│  ✓ All 24 skills                                         │
+│  ✓ All 16 live-data skills (DeFiLlama + Etherscan)    │
 │  ✓ 9 personality-driven actions                          │
 │  ✓ Live Oracle data (search + daily market snapshot)     │
 │  ✓ Passive market intelligence evaluator                 │
@@ -82,7 +82,18 @@ Add to your ElizaOS `character.json`:
 }
 ```
 
-That's it. Your agent loads a demo personality with all 24 skills and live Oracle data. No wallet, no API key, no workspace download needed.
+That's it. Your agent loads a demo personality with all 16 skills and live Oracle data. No wallet, no API key, no workspace download needed.
+
+For enhanced on-chain data (portfolio checks, whale tracking), set an optional Etherscan API key:
+
+```json
+{
+  "plugins": ["plugin-undesirables"],
+  "settings": {
+    "ETHERSCAN_API_KEY": "your-free-etherscan-key"
+  }
+}
+```
 
 ### Option B: NFT Holder (Unique Soul)
 
@@ -123,25 +134,38 @@ Your agent gets a unique personality derived from your NFT's visual traits — B
 | `UNDESIRABLE_MARKET_ANALYSIS` | Personality-driven market analysis with conviction scoring and risk guardrails |
 | `UNDESIRABLE_BUSINESS_PILOT` | AI business automation — phone answering, SMS, invoicing, scheduling |
 | `UNDESIRABLE_MEME_MACHINE` | Content creation — meme concepts, brand voice, content calendars |
-| `UNDESIRABLE_LOAD_SKILL` | Routes user messages to the best-matching skill from the 24 available |
-| `UNDESIRABLE_WHALE_TRACKER` | Whale wallet movement analysis and smart money flow tracking |
-| `UNDESIRABLE_ENTRY_SIGNAL` | Entry evaluation — GO / WAIT / NO-GO with support/resistance levels |
-| `UNDESIRABLE_PORTFOLIO_CHECK` | Portfolio health assessment with A–F rating and concentration risk |
-| `UNDESIRABLE_EXIT_STRATEGY` | Exit planning — TP1/TP2/TP3 levels, stop losses, time-based rules |
-| `UNDESIRABLE_RISK_ASSESSMENT` | Risk rating 1–10 with SAFE / CAUTION / DANGER verdict |
+| `UNDESIRABLE_LOAD_SKILL` | Routes user messages to the best-matching skill from the 16 available |
+| `UNDESIRABLE_WHALE_TRACKER` | Whale wallet movement analysis via live Etherscan data |
+| `UNDESIRABLE_ENTRY_SIGNAL` | Entry evaluation — GO / WAIT / NO-GO with live DeFiLlama prices |
+| `UNDESIRABLE_PORTFOLIO_CHECK` | Portfolio health via on-chain Etherscan balance data |
+| `UNDESIRABLE_EXIT_STRATEGY` | Exit planning — TP1/TP2/TP3 levels using live prices |
+| `UNDESIRABLE_RISK_ASSESSMENT` | Risk rating 1–10 using live DeFiLlama protocol TVL data |
 
-### Skills (24)
+### Skills (16)
 
-All 24 skills are available to every user — demo and NFT holder alike.
+All 16 skills are available to every user — demo and NFT holder alike. Financial skills fetch live data from free APIs.
 
-| Category | Skills |
-|----------|--------|
-| **Trading** | Market Analysis, Entry Signal, Exit Strategy, Conviction Score, Position Sizing |
-| **Portfolio** | Portfolio Check, Rebalance Check, Diversification, Sector Rotation |
-| **Risk** | Risk Assessment, Volatility Scan, Liquidation Watch, MEV Detection |
-| **DeFi** | Farm Yield, Compound Strategy, Snipe Launch, Memecoin Scanner, Ape Checklist |
-| **Social** | Whale Tracker, Copy Trade, Prediction Log |
-| **Content** | Content Creation, Image Generation, Music Generation, Video Production |
+| Category | Skills | Data Source |
+|----------|--------|------------|
+| **Market** | Market Analysis, Entry Signal, Exit Strategy, Conviction Score | Oracle API, DeFiLlama prices |
+| **Portfolio** | Portfolio Check, Rebalance Check | Etherscan V2 (on-chain) |
+| **DeFi** | Farm Yield, Compound Strategy, Risk Assessment | DeFiLlama yields + protocol TVL |
+| **On-Chain** | Whale Tracker | Etherscan V2 (transactions) |
+| **Content** | Content Creation, Image Generation, Music Generation, Meme Machine | LLM + MCP tools |
+| **Business** | Business Pilot | 23-module setup system |
+| **Logging** | Prediction Log | Local JSON ledger |
+
+---
+
+## Data Sources
+
+| API | Auth | What It Provides | Skills Powered |
+|-----|------|-----------------|----------------|
+| **Oracle API** | None (free) | 370K+ TCG product prices, daily market snapshots | Market Analysis |
+| **DeFiLlama** | None (free) | Yield pool APYs, protocol TVL, token prices | Entry Signal, Exit Strategy, Farm Yield, Risk Assessment, Conviction Score, Compound Strategy |
+| **Etherscan V2** | Free API key | On-chain wallet balances, transaction history | Portfolio Check, Whale Tracker, Rebalance Check |
+
+> **No user data is stored.** All API calls are stateless — data is fetched, displayed, and discarded. No wallets, addresses, or personal information is saved to disk or transmitted to third parties.
 
 ---
 
@@ -149,8 +173,9 @@ All 24 skills are available to every user — demo and NFT holder alike.
 
 | Feature | Demo (Free) | NFT Holder |
 |---------|:-----------:|:----------:|
-| All 24 skills | ✓ | ✓ |
+| All 16 skills | ✓ | ✓ |
 | Live Oracle data | ✓ | ✓ |
+| Live DeFiLlama + Etherscan data | ✓ | ✓ |
 | Market intelligence evaluator | ✓ | ✓ |
 | All 9 actions | ✓ | ✓ |
 | **Unique personality** | — | ✓ |
@@ -232,6 +257,10 @@ Workspaces are keyed by `runtime.agentId`. Multiple Undesirable agents can run i
 - **[The Undesirables](https://the-undesirables.com)** — 4,444 AI agents on Ethereum
 - **[Scatter.art](https://scatter.art/the-undesirables)** — Mint page
 - **[Etherscan](https://etherscan.io/address/0xa893648a701c03b14bf2fb767b72b2c55ed5c17a)** — Contract
+
+## Disclaimer
+
+⚠️ **This plugin provides AI-generated analysis using live market data. It is NOT financial, investment, or trading advice.** The developers of this plugin assume NO liability for any financial decisions or losses resulting from the use of this software. Users are solely responsible for their own research and investment decisions. Past performance does not guarantee future results. All financial skills include automated disclaimers in their output.
 
 ---
 
