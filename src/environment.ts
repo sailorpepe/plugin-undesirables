@@ -42,3 +42,13 @@ export function validateUndesirableConfig(
 
   return { valid: true, workspacePath };
 }
+
+/**
+ * Optional environment variables for enhanced data:
+ *
+ * ETHERSCAN_API_KEY — Free API key from etherscan.io. Enables real on-chain
+ * wallet balance lookups for check_portfolio, whale_tracker, and rebalance_check
+ * skills. Without it, these skills fall back to LLM-only mode.
+ *
+ * DeFiLlama endpoints (yields, protocol TVL, coin prices) require NO API key.
+ */

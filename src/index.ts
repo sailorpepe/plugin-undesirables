@@ -1,21 +1,26 @@
 /**
- * The Undesirables — ElizaOS Plugin v2.3
+ * The Undesirables — ElizaOS Plugin v2.5
  * ========================================
  * Pioneers "Personality-as-Code" via verifiable soul workspaces.
  * Each of 4,444 NFTs generates a unique AI personality from its visual traits.
  *
  * Access Model:
- * - NFT Holders: Full soul workspace (unique personality, 24 skills, memory)
+ * - NFT Holders: Full soul workspace (unique personality, 16 skills, memory)
  * - Non-Holders: Demo soul (community personality, 5 basic skills)
  * - All Users: Live TCG Oracle data via free search endpoint
  *
  * Features:
- * - 10 actions + 24 skill matchers
- * - Live Oracle provider (real market data from 427K+ products)
+ * - 10 actions + 16 live-data skills (DeFiLlama, Etherscan, Oracle API)
+ * - Live Oracle provider (real market data from 370K+ products)
  * - Demo soul for non-holders (drives mint conversion)
  * - Market analysis with personality-driven perspective
  * - Business Pilot — 23 AI-powered business modules
  * - Multi-agent safe (workspaces keyed by agentId)
+ *
+ * DISCLAIMER: This plugin provides AI-generated analysis using live market
+ * data. It is NOT financial advice. Users are solely responsible for their
+ * own investment decisions. The developer assumes NO liability for any
+ * financial losses. See LICENSE for full terms.
  *
  * @see https://the-undesirables.com
  * @see https://github.com/sailorpepe/undesirables-mcp-server
@@ -49,9 +54,20 @@ const ORACLE_BASE_URL = "https://oracle.the-undesirables.com";
 const ORACLE_SEARCH_ENDPOINT = `${ORACLE_BASE_URL}/api/v1/search`;
 const ORACLE_MARKET_ENDPOINT = `${ORACLE_BASE_URL}/api/v1/market`;
 const SCATTER_MINT_URL = "https://scatter.art/the-undesirables";
-const PLUGIN_VERSION = "2.4.4";
+const PLUGIN_VERSION = "2.5.0";
 const COLLECTION_TOTAL = 4444;
 const MINTED_COUNT = 273;
+
+// Legal disclaimer injected into all financial skill responses
+const FINANCIAL_DISCLAIMER = [
+  "",
+  "---",
+  "⚠️ DISCLAIMER: This is AI-generated analysis using live market data from DeFiLlama and Etherscan.",
+  "This is NOT financial, investment, or trading advice. The developer of this plugin assumes NO",
+  "liability for any financial decisions or losses. You are solely responsible for your own research",
+  "and investment decisions. Past performance does not guarantee future results.",
+  "---",
+].join("\n");
 
 // ============================================================
 // Demo Soul — Ships with the plugin for non-holders
@@ -246,6 +262,12 @@ function buildSkillContext(
   userMessage: string,
   instructions: string
 ): string {
+  // Detect if this is a financial skill that needs disclaimers
+  const financialKeywords = ["price", "yield", "apy", "tvl", "portfolio", "wallet", "balance",
+    "entry", "exit", "buy", "sell", "risk", "whale", "rebalance", "conviction", "compound"];
+  const isFinancial = financialKeywords.some((k) => skillContent.toLowerCase().includes(k) || instructions.toLowerCase().includes(k));
+  const disclaimer = isFinancial ? `\n\nYou MUST include this disclaimer at the end of your response:\n${FINANCIAL_DISCLAIMER}` : "";
+
   return `You are an Undesirable AI agent with a unique personality.
 
 Your personality context:
@@ -262,7 +284,7 @@ ${JSON.stringify(workspace.predictions.slice(-3), null, 2)}
 
 The user asks: ${userMessage}
 
-${instructions}
+${instructions}${disclaimer}
 
 Respond in character using your archetype, risk tolerance, and guardrails.`;
 }
@@ -556,7 +578,7 @@ const loadSkillAction: Action = {
     let matchedSkill = "";
     let matchedName = "";
 
-    // All 23 unique skills mapped with trigger words
+    // 15 skills mapped with trigger words (all have matching .md files or first-class actions)
     const skillMatches: Record<string, string[]> = {
       check_portfolio: ["portfolio", "balance", "holdings", "how am i doing"],
       content_creation: ["tweet", "write", "promote", "content", "thread"],
@@ -568,20 +590,11 @@ const loadSkillAction: Action = {
       farm_yield: ["farm", "yield farming", "liquidity", "lp", "best yield"],
       compound_strategy: ["compound", "auto-compound", "compounding", "apy", "harvest"],
       risk_assessment: ["risk", "downside", "worst case", "is this safe"],
-      snipe_launch: ["snipe", "new launch", "token launching", "just launched"],
-      memecoin_scanner: ["memecoin", "find me a gem", "degen scan", "what memecoins"],
-      ape_checklist: ["should i ape", "ape check", "is this a good ape"],
       whale_tracker: ["whale", "smart money", "whale watch", "what are whales buying"],
-      copy_trade: ["copy trade", "mirror this", "follow this wallet"],
-      position_sizing: ["position size", "how much should i buy", "how big"],
-      volatility_scan: ["volatile", "volatility", "what's moving", "find volatile"],
-      liquidation_watch: ["liquidation", "liquidation levels", "longs", "shorts"],
-      mev_detect: ["mev", "sandwich", "front-running", "front run"],
       entry_signal: ["entry", "should i buy", "good time to buy", "buy signal"],
       exit_strategy: ["exit", "sell", "take profit", "stop loss", "when should i sell"],
       rebalance_check: ["rebalance", "allocation", "portfolio drift"],
-      diversify_check: ["diversify", "diversification", "spread", "concentrate"],
-      sector_rotation: ["sector", "rotation", "rotate", "cycle"],
+      market_analysis: ["market", "analysis", "market cap", "trending"],
     };
 
     for (const [skillName, triggers] of Object.entries(skillMatches)) {
@@ -604,11 +617,15 @@ const loadSkillAction: Action = {
       return { success: true, text: `Listed ${available.split(", ").length} available skills` };
     }
 
+    // Inject live data from DeFiLlama/Etherscan if available
+    const liveData = await fetchSkillData(matchedName, text);
+    const enrichedSkill = liveData ? matchedSkill + liveData : matchedSkill;
+
     const context = buildSkillContext(
-      matchedSkill,
+      enrichedSkill,
       workspace,
       message.content.text || "",
-      `Execute the ${matchedName.replace(/_/g, " ")} skill thoroughly.`
+      `Execute the ${matchedName.replace(/_/g, " ")} skill thoroughly. Use the LIVE DATA provided above in your analysis — do not invent numbers.`
     );
 
     return generateResponse(runtime, context, callback, "UNDESIRABLE_LOAD_SKILL");
@@ -666,8 +683,9 @@ const whaleTrackerAction: Action = {
       return { success: false, error: "No soul workspace loaded" };
     }
     const skill = workspace.skills["whale_tracker"] || "";
-    const context = buildSkillContext(skill, workspace, message.content.text || "",
-      "Identify the top 3-5 whale movements with wallet addresses, amounts, and your conviction on whether to follow.");
+    const liveData = await fetchSkillData("whale_tracker", message.content.text || "");
+    const context = buildSkillContext(skill + liveData, workspace, message.content.text || "",
+      "Identify the top 3-5 whale movements with wallet addresses, amounts, and your conviction on whether to follow. Use the LIVE DATA above — do not invent transactions.");
     return generateResponse(runtime, context, callback, "UNDESIRABLE_WHALE_TRACKER");
   },
 };
@@ -717,8 +735,9 @@ const entrySignalAction: Action = {
       return { success: false, error: "No soul workspace loaded" };
     }
     const skill = workspace.skills["entry_signal"] || "";
-    const context = buildSkillContext(skill, workspace, message.content.text || "",
-      "Provide a clear GO / WAIT / NO-GO entry signal with price levels, risk/reward ratio, and conviction score.");
+    const liveData = await fetchSkillData("entry_signal", message.content.text || "");
+    const context = buildSkillContext(skill + liveData, workspace, message.content.text || "",
+      "Provide a clear GO / WAIT / NO-GO entry signal with price levels, risk/reward ratio, and conviction score. Use the LIVE PRICE DATA above — do not invent prices.");
     return generateResponse(runtime, context, callback, "UNDESIRABLE_ENTRY_SIGNAL");
   },
 };
@@ -768,8 +787,9 @@ const portfolioCheckAction: Action = {
       return { success: false, error: "No soul workspace loaded" };
     }
     const skill = workspace.skills["check_portfolio"] || "";
-    const context = buildSkillContext(skill, workspace, message.content.text || "",
-      "Evaluate portfolio health against your risk guardrails. Flag concentration risks, suggest rebalancing, and rate overall health A-F.");
+    const liveData = await fetchSkillData("check_portfolio", message.content.text || "");
+    const context = buildSkillContext(skill + liveData, workspace, message.content.text || "",
+      "Evaluate portfolio health against your risk guardrails. Use the LIVE ON-CHAIN DATA above. Flag concentration risks, suggest rebalancing, and rate overall health A-F.");
     return generateResponse(runtime, context, callback, "UNDESIRABLE_PORTFOLIO_CHECK");
   },
 };
@@ -825,8 +845,9 @@ const exitStrategyAction: Action = {
       return { success: false, error: "No soul workspace loaded" };
     }
     const skill = workspace.skills["exit_strategy"] || "";
-    const context = buildSkillContext(skill, workspace, message.content.text || "",
-      "Provide specific take profit levels (TP1, TP2, TP3), stop loss placement, and time-based exit rules based on your trading personality.");
+    const liveData = await fetchSkillData("exit_strategy", message.content.text || "");
+    const context = buildSkillContext(skill + liveData, workspace, message.content.text || "",
+      "Provide specific take profit levels (TP1, TP2, TP3), stop loss placement, and time-based exit rules. Use the LIVE PRICE DATA above — do not invent prices.");
     return generateResponse(runtime, context, callback, "UNDESIRABLE_EXIT_STRATEGY");
   },
 };
@@ -876,8 +897,9 @@ const riskAssessmentAction: Action = {
       return { success: false, error: "No soul workspace loaded" };
     }
     const skill = workspace.skills["risk_assessment"] || "";
-    const context = buildSkillContext(skill, workspace, message.content.text || "",
-      "Provide a risk rating (1-10), identify top 3 risk factors, and give a clear SAFE / CAUTION / DANGER verdict with reasoning.");
+    const liveData = await fetchSkillData("risk_assessment", message.content.text || "");
+    const context = buildSkillContext(skill + liveData, workspace, message.content.text || "",
+      "Provide a risk rating (1-10), identify top 3 risk factors, and give a clear SAFE / CAUTION / DANGER verdict. Use the LIVE PROTOCOL DATA above — do not invent TVL or audit data.");
     return generateResponse(runtime, context, callback, "UNDESIRABLE_RISK_ASSESSMENT");
   },
 };
@@ -901,6 +923,248 @@ async function oracleFetch(url: string): Promise<Record<string, unknown> | null>
     const msg = err instanceof Error ? err.message : "Unknown";
     console.error(`[Undesirables Oracle] Fetch failed: ${msg}`);
     return null;
+  }
+}
+
+/** DeFiLlama fetch helper — no API key needed */
+async function defiFetch(endpoint: string): Promise<Record<string, unknown> | null> {
+  try {
+    const base = endpoint.startsWith("yields") || endpoint.startsWith("pools")
+      ? "https://yields.llama.fi"
+      : "https://api.llama.fi";
+    const url = endpoint.startsWith("http") ? endpoint : `${base}/${endpoint}`;
+    const response = await fetch(url, {
+      method: "GET",
+      headers: { "User-Agent": `plugin-undesirables/${PLUGIN_VERSION}` },
+      signal: AbortSignal.timeout(12000),
+      redirect: "error",
+    });
+    if (!response.ok) return null;
+    return (await response.json()) as Record<string, unknown>;
+  } catch (err: unknown) {
+    const msg = err instanceof Error ? err.message : "Unknown";
+    console.error(`[Undesirables DeFi] Fetch failed: ${msg}`);
+    return null;
+  }
+}
+
+/** DeFiLlama coin prices — no API key needed */
+async function defiPriceFetch(
+  tokenIds: string[]
+): Promise<Record<string, { price: number; symbol: string; confidence: number }> | null> {
+  try {
+    const coins = tokenIds.map((t) => `coingecko:${t}`).join(",");
+    const response = await fetch(
+      `https://coins.llama.fi/prices/current/${coins}`,
+      {
+        method: "GET",
+        headers: { "User-Agent": `plugin-undesirables/${PLUGIN_VERSION}` },
+        signal: AbortSignal.timeout(8000),
+        redirect: "error",
+      }
+    );
+    if (!response.ok) return null;
+    const data = (await response.json()) as {
+      coins: Record<string, { price: number; symbol: string; confidence: number }>;
+    };
+    return data.coins;
+  } catch (err: unknown) {
+    console.error(
+      `[Undesirables DeFi] Price fetch failed: ${
+        err instanceof Error ? err.message : "Unknown"
+      }`
+    );
+    return null;
+  }
+}
+
+/** Etherscan V2 fetch helper — requires free API key from env */
+async function etherscanFetch(
+  params: Record<string, string>
+): Promise<Record<string, unknown> | null> {
+  const apiKey = process.env.ETHERSCAN_API_KEY || "";
+  if (!apiKey) return null;
+  try {
+    const queryParams = new URLSearchParams({
+      ...params,
+      chainid: "1",
+      apikey: apiKey,
+    });
+    const response = await fetch(
+      `https://api.etherscan.io/v2/api?${queryParams}`,
+      {
+        method: "GET",
+        headers: { "User-Agent": `plugin-undesirables/${PLUGIN_VERSION}` },
+        signal: AbortSignal.timeout(8000),
+        redirect: "error",
+      }
+    );
+    if (!response.ok) return null;
+    const data = (await response.json()) as Record<string, unknown>;
+    if (data.status !== "1") return null;
+    return data;
+  } catch (err: unknown) {
+    console.error(
+      `[Undesirables Etherscan] Fetch failed: ${
+        err instanceof Error ? err.message : "Unknown"
+      }`
+    );
+    return null;
+  }
+}
+
+/** Fetch live data for a skill from DeFiLlama/Etherscan */
+async function fetchSkillData(
+  skillName: string,
+  userMessage: string
+): Promise<string> {
+  const DISCLAIMER = "\n⚠️ Live data via DeFiLlama/Etherscan. Not financial advice.";
+  try {
+    switch (skillName) {
+      case "farm_yield":
+      case "compound_strategy": {
+        const data = await defiFetch("pools");
+        if (!data) return "";
+        const allPools = (data as { data?: unknown[] }).data;
+        if (!Array.isArray(allPools)) return "";
+        type YieldPool = { project: string; chain: string; symbol: string; tvlUsd: number; apy: number; apyBase?: number; apyReward?: number; stablecoin?: boolean };
+        const pools = (allPools as YieldPool[])
+          .filter((p) => (p.tvlUsd || 0) > 10_000_000 && (p.apy || 0) > 0.5)
+          .sort((a, b) => (b.tvlUsd || 0) - (a.tvlUsd || 0))
+          .slice(0, 10);
+        if (pools.length === 0) return "";
+        return (
+          "\n\n📊 LIVE YIELD DATA (DeFiLlama — real-time):\n" +
+          pools
+            .map(
+              (p) =>
+                `• ${p.project} (${p.chain}) — ${p.symbol} — APY: ${(
+                  p.apy || 0
+                ).toFixed(2)}% (base: ${(p.apyBase || 0).toFixed(2)}% + reward: ${(
+                  p.apyReward || 0
+                ).toFixed(2)}%) — TVL: $${((p.tvlUsd || 0) / 1e6).toFixed(
+                  1
+                )}M${p.stablecoin ? " [stablecoin]" : ""}`
+            )
+            .join("\n") +
+          DISCLAIMER
+        );
+      }
+
+      case "conviction_score":
+      case "entry_signal":
+      case "exit_strategy": {
+        const prices = await defiPriceFetch([
+          "bitcoin",
+          "ethereum",
+          "solana",
+          "arbitrum",
+        ]);
+        if (!prices) return "";
+        const entries = Object.entries(prices).map(
+          ([, v]) =>
+            `• ${v.symbol}: $${v.price.toLocaleString("en-US", {
+              minimumFractionDigits: 2,
+              maximumFractionDigits: 2,
+            })} (confidence: ${(v.confidence * 100).toFixed(0)}%)`
+        );
+        return (
+          "\n\n📊 LIVE PRICE DATA (DeFiLlama — real-time):\n" +
+          entries.join("\n") +
+          "\nUse these REAL prices in your analysis. Do NOT invent price data." +
+          DISCLAIMER
+        );
+      }
+
+      case "check_portfolio":
+      case "rebalance_check": {
+        const addrMatch = userMessage.match(/0x[a-fA-F0-9]{40}/);
+        if (!addrMatch)
+          return "\n\nNote: Provide an Ethereum wallet address (0x...) for real on-chain balance data. Without it, analysis will be general guidance only.";
+        const balance = await etherscanFetch({
+          module: "account",
+          action: "balance",
+          address: addrMatch[0],
+          tag: "latest",
+        });
+        if (!balance)
+          return "\n\nNote: Etherscan API unavailable. Set ETHERSCAN_API_KEY env var for real wallet data.";
+        const ethBalance = Number(balance.result) / 1e18;
+        const ethPrice = await defiPriceFetch(["ethereum"]);
+        const usdValue = ethPrice
+          ? ethBalance *
+            (Object.values(ethPrice)[0]?.price || 0)
+          : 0;
+        return (
+          `\n\n📊 LIVE ON-CHAIN DATA (Etherscan V2 — real-time):\n` +
+          `• Wallet: ${addrMatch[0].slice(0, 6)}...${addrMatch[0].slice(-4)}\n` +
+          `• ETH Balance: ${ethBalance.toFixed(4)} ETH` +
+          (usdValue > 0 ? ` (~$${usdValue.toFixed(2)})` : "") +
+          DISCLAIMER
+        );
+      }
+
+      case "whale_tracker": {
+        const addrMatch = userMessage.match(/0x[a-fA-F0-9]{40}/);
+        const whaleAddr = addrMatch?.[0] || "0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045"; // default: vitalik
+        const txData = await etherscanFetch({
+          module: "account",
+          action: "txlist",
+          address: whaleAddr,
+          startblock: "0",
+          endblock: "99999999",
+          page: "1",
+          offset: "5",
+          sort: "desc",
+        });
+        if (!txData || !Array.isArray(txData.result)) return "";
+        type EthTx = { hash: string; from: string; to: string; value: string; timeStamp: string };
+        const txs = (txData.result as EthTx[]).slice(0, 5);
+        if (txs.length === 0) return "";
+        return (
+          `\n\n📊 LIVE WHALE DATA (Etherscan V2 — real-time):\n` +
+          `Wallet: ${whaleAddr.slice(0, 6)}...${whaleAddr.slice(-4)}\n` +
+          txs
+            .map((tx) => {
+              const ethVal = (Number(tx.value) / 1e18).toFixed(4);
+              const date = new Date(Number(tx.timeStamp) * 1000).toISOString().split("T")[0];
+              const dir = tx.from.toLowerCase() === whaleAddr.toLowerCase() ? "OUT" : "IN";
+              return `• [${date}] ${dir} ${ethVal} ETH — ${tx.hash.slice(0, 10)}...`;
+            })
+            .join("\n") +
+          DISCLAIMER
+        );
+      }
+
+      case "risk_assessment": {
+        // Try to extract protocol name from user message
+        const protocols = ["aave", "compound", "lido", "maker", "uniswap", "curve", "convex", "yearn", "balancer", "sushi"];
+        const mentioned = protocols.find((p) => userMessage.toLowerCase().includes(p));
+        if (!mentioned) return "";
+        const data = await defiFetch(`protocol/${mentioned}-v3`) || await defiFetch(`protocol/${mentioned}`);
+        if (!data) return "";
+        type ProtocolData = { name: string; tvl?: { date: number; totalLiquidityUSD: number }[]; currentChainTvls?: Record<string, number>; category?: string; chains?: string[] };
+        const proto = data as unknown as ProtocolData;
+        const currentTvl = proto.currentChainTvls
+          ? Object.values(proto.currentChainTvls).reduce((a, b) => a + b, 0)
+          : 0;
+        const chains = proto.chains?.join(", ") || "unknown";
+        return (
+          `\n\n📊 LIVE PROTOCOL DATA (DeFiLlama — real-time):\n` +
+          `• Protocol: ${proto.name || mentioned}\n` +
+          `• Category: ${proto.category || "DeFi"}\n` +
+          `• Total TVL: $${(currentTvl / 1e9).toFixed(2)}B\n` +
+          `• Chains: ${chains}` +
+          DISCLAIMER
+        );
+      }
+
+      default:
+        return "";
+    }
+  } catch (err: unknown) {
+    console.error(`[Undesirables] fetchSkillData error for ${skillName}: ${err instanceof Error ? err.message : "Unknown"}`);
+    return "";
   }
 }
 
