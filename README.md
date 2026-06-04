@@ -13,6 +13,23 @@
 
 ---
 
+## 📑 Table of Contents
+
+- [What This Does](#what-this-does)
+- [Architecture](#architecture)
+- [Quick Start](#quick-start)
+- [What's Included](#whats-included)
+- [Data Sources](#data-sources)
+- [Access Model](#access-model)
+- [How Personality Works](#how-personality-works)
+- [Security](#security)
+- [Troubleshooting](#troubleshooting)
+- [Ecosystem](#ecosystem)
+- [Disclaimer](#disclaimer)
+- [License & Commercial Use](#-license--commercial-use)
+
+---
+
 ## What This Does
 
 `plugin-undesirables` gives any ElizaOS agent a structured personality, live market data from multiple free APIs, and 16 specialized skills — with zero configuration required.
@@ -295,3 +312,13 @@ Building a commercial product? Want guaranteed API access or white-label integra
 📧 **theundesirables7@gmail.com** · 🐦 **[@undesirables_ai](https://x.com/undesirables_ai)**
 
 © 2026 The Undesirables LLC
+
+---
+
+<div align="center">
+
+⭐ **If this project helped you, please star this repo** — it helps others find it.
+
+[Report Bug](../../issues) · [Request Feature](../../issues)
+
+</div>
