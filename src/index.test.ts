@@ -158,7 +158,7 @@ describe("plugin-undesirables", () => {
     it("should export a valid ElizaOS v2 plugin", async () => {
       const plugin = (await import("./index.js")).default;
 
-      expect(plugin.actions.length).toBeGreaterThan(0);
+      expect(plugin.actions!.length).toBeGreaterThan(0);
       expect(plugin.providers).toBeDefined();
       expect(plugin.providers?.length).toBeGreaterThan(0);
       expect(plugin.evaluators).toBeDefined();
