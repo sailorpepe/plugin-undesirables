@@ -15,7 +15,7 @@
         ],
         "paid": [
           {"path": "/api/v1/grade", "price": "$0.10", "description": "AI card grading (PSA/Beckett)"},
-          {"path": "/api/v1/simulate", "price": "$0.015", "description": "Monte Carlo price simulation (Heston/Merton/Kou)"},
+          {"path": "/api/v1/simulate", "price": "$0.015", "description": "Conformal risk forecast (Monte Carlo GBM/Merton opt-in)"},
           {"path": "/api/v1/crypto-oracle", "price": "$0.05", "description": "NFT floor + Monte Carlo"},
           {"path": "/api/v1/coin-history", "price": "$0.05", "description": "Token price simulation"},
           {"path": "/api/v1/arb-cross", "price": "$1.00", "description": "Kalshi/Polymarket arbitrage"},
