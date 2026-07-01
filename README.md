@@ -9,7 +9,7 @@
 [![MCP Server](https://img.shields.io/badge/MCP_Server-35+_Tools-green.svg)](https://github.com/sailorpepe/undesirables-mcp-server)
 [![x402](https://img.shields.io/badge/x402-Oracle_API-orange.svg)](https://oracle.the-undesirables.com)
 
-> Personality-as-Code for ElizaOS agents. Live market data from 370K+ indexed products. Zero config required.
+> Personality-as-Code for ElizaOS agents. Live market data from 442K+ indexed products. Zero config required.
 
 ---
 
@@ -37,7 +37,7 @@
 Install the plugin, and your agent immediately gets:
 
 - **A working personality** — a demo soul loads automatically. NFT holders get their unique AI identity.
-- **Live market data** — real product prices from 370K+ indexed TCG products, DeFi yields from DeFiLlama, on-chain balances from Etherscan.
+- **Live market data** — real product prices from 442K+ indexed TCG products, DeFi yields from DeFiLlama, on-chain balances from Etherscan.
 - **16 live-data skills** — market analysis, portfolio checks, entry signals, exit strategies, risk assessment, yield farming, content creation, and more. All financial skills fetch real data.
 - **Passive market intelligence** — an evaluator that detects card/market topics and enriches the agent's context with live pricing data automatically.
 
@@ -135,7 +135,7 @@ Your agent gets a unique personality derived from your NFT's visual traits — B
 
 | Provider | What It Does |
 |----------|-------------|
-| `undesirables-oracle` | Fetches live product prices from 370K+ indexed TCG products and daily market snapshots. Triggers automatically when the conversation mentions cards, prices, or market topics. |
+| `undesirables-oracle` | Fetches live product prices from 442K+ indexed TCG products and daily market snapshots. Triggers automatically when the conversation mentions cards, prices, or market topics. |
 | `undesirables-soul` | Injects the agent's personality context into every response. Loads demo soul by default or the NFT holder's unique soul when configured. |
 
 ### Evaluators (1)
@@ -178,7 +178,7 @@ All 16 skills are available to every user — demo and NFT holder alike. Financi
 
 | API | Auth | What It Provides | Skills Powered |
 |-----|------|-----------------|----------------|
-| **Oracle API** | None (free) | 370K+ TCG product prices, daily market snapshots | Market Analysis |
+| **Oracle API** | None (free) | 442K+ TCG product prices, daily market snapshots | Market Analysis |
 | **DeFiLlama** | None (free) | Yield pool APYs, protocol TVL, token prices | Entry Signal, Exit Strategy, Farm Yield, Risk Assessment, Conviction Score, Compound Strategy |
 | **Etherscan V2** | Free API key | On-chain wallet balances, transaction history | Portfolio Check, Whale Tracker, Rebalance Check |
 
@@ -267,7 +267,7 @@ Workspaces are keyed by `runtime.agentId`. Multiple Undesirable agents can run i
 - **[TCG Oracle Desktop](https://github.com/sailorpepe/undesirables-desktop/releases)** — macOS, Linux, Windows installer with AI card grading UI
 
 ### Data & Research
-- **[Kaggle Dataset](https://www.kaggle.com/datasets/sailorpepe/tcg-market-intelligence)** — 370K+ TCG products across 25 games
+- **[Kaggle Dataset](https://www.kaggle.com/datasets/sailorpepe/tcg-market-intelligence)** — 442K+ TCG products across 13 games
 - **[Dev.to Tutorial](https://dev.to/sailor_pepe_7920f552c5b9a/build-an-autonomous-pokemon-card-trading-agent-with-ai-grading-monte-carlo-pricing-2b86)** — Build guide
 
 ### Collection
