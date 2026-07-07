@@ -267,7 +267,7 @@ Workspaces are keyed by `runtime.agentId`. Multiple Undesirable agents can run i
 - **[TCG Oracle Desktop](https://github.com/sailorpepe/undesirables-desktop/releases)** — macOS, Linux, Windows installer with AI card grading UI
 
 ### Data & Research
-- **[Kaggle Dataset](https://www.kaggle.com/datasets/sailorpepe/tcg-market-intelligence)** — 442K+ TCG products across 13 games
+- **[Kaggle Dataset](https://www.kaggle.com/datasets/sailorpepe/tcg-market-intelligence)** — 442K+ TCG products across 25 games
 - **[Dev.to Tutorial](https://dev.to/sailor_pepe_7920f552c5b9a/build-an-autonomous-pokemon-card-trading-agent-with-ai-grading-monte-carlo-pricing-2b86)** — Build guide
 
 ### Collection
