@@ -1,7 +1,7 @@
 {
   "name": "plugin-undesirables",
-  "version": "2.5.0",
-  "description": "ElizaOS plugin — Personality-as-Code for AI agents. 16 live-data skills powered by DeFiLlama + Etherscan + Oracle API (370K+ TCG products). 9 actions, zero-config demo soul. NFT holders get unique Big Five psychology profiles with persistent memory. Not financial advice.",
+  "version": "2.5.1",
+  "description": "ElizaOS plugin \u2014 Personality-as-Code for AI agents. 16 live-data skills powered by DeFiLlama + Etherscan + Oracle API (446K+ TCG products). 9 actions, zero-config demo soul. NFT holders get unique Big Five psychology profiles with persistent memory. Not financial advice.",
   "main": "dist/index.js",
   "module": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -79,7 +79,7 @@
     "pluginParameters": {
       "UNDESIRABLES_WORKSPACE": {
         "type": "string",
-        "description": "Path to an Undesirables soul workspace directory. Optional — a demo soul loads automatically if not set.",
+        "description": "Path to an Undesirables soul workspace directory. Optional \u2014 a demo soul loads automatically if not set.",
         "required": false,
         "sensitive": false
       },
