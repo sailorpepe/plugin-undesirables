@@ -11,7 +11,7 @@
  *
  * Features:
  * - 10 actions + 16 live-data skills (DeFiLlama, Etherscan, Oracle API)
- * - Live Oracle provider (real market data from 370K+ products)
+ * - Live Oracle provider (real market data from 446K+ products)
  * - Demo soul for non-holders (drives mint conversion)
  * - Market analysis with personality-driven perspective
  * - Business Pilot — 23 AI-powered business modules
@@ -1182,7 +1182,7 @@ async function fetchSkillData(
  */
 const oracleProvider: Provider = {
   name: "undesirables-oracle",
-  description: "Live TCG market intelligence from the Undesirables Oracle API (370K+ products, real prices, daily snapshots)",
+  description: "Live TCG market intelligence from the Undesirables Oracle API (446K+ products, real prices, daily snapshots)",
   get: async (runtime: IAgentRuntime, message: Memory, _state: State): Promise<ProviderResult> => {
     const text = message?.content?.text || "";
     if (!text || text.length < 3) {
@@ -1430,7 +1430,7 @@ const undesirablePlugin: Plugin = {
   description:
     "The Undesirables — 4,444 autonomous AI agents on Ethereum. " +
     "Pioneers 'Personality-as-Code' via verifiable soul workspaces. " +
-    "Live TCG Oracle data (370K+ products), daily market snapshots, " +
+    "Live TCG Oracle data (446K+ products), daily market snapshots, " +
     "passive market intelligence evaluator, personality-driven analysis, " +
     "and 24 skill matchers. Zero config required — demo soul included.",
   init: async (config: Record<string, string>, runtime: IAgentRuntime) => {
