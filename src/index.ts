@@ -52,7 +52,6 @@ import { MemeTrendService } from "./services.js";
 
 const ORACLE_BASE_URL = "https://oracle.the-undesirables.com";
 const ORACLE_SEARCH_ENDPOINT = `${ORACLE_BASE_URL}/api/v1/search`;
-const ORACLE_MARKET_ENDPOINT = `${ORACLE_BASE_URL}/api/v1/market`;
 const SCATTER_MINT_URL = "https://scatter.art/the-undesirables";
 const PLUGIN_VERSION = "2.6.0";
 const COLLECTION_TOTAL = 4444;
@@ -1206,35 +1205,46 @@ const oracleProvider: Provider = {
 
     const parts: string[] = [];
 
-    // Product search
+    // Product search — the oracle returns { product_id, name, market_price_usd, set }.
+    // (2.6.0 read market_price/low/mid/high/price_date, none of which exist, and
+    // narrated "$0.00 (undefined)" into context as real data. Audit 2026-08-07.)
     if (wantSearch) {
-      const searchTerms = text.replace(/[^a-zA-Z0-9\s-]/g, "").trim().slice(0, 100);
-      const data = await oracleFetch(`${ORACLE_SEARCH_ENDPOINT}?query=${encodeURIComponent(searchTerms)}&limit=5`);
-      const results = (data?.data as Record<string, unknown>)?.results as Array<Record<string, unknown>> || [];
-
-      if (results.length > 0) {
-        const formatted = results.map((r: Record<string, unknown>) =>
-          `• ${r.name} — Market: $${Number(r.market_price || 0).toFixed(2)} | Low: $${Number(r.low_price || 0).toFixed(2)} | Mid: $${Number(r.mid_price || 0).toFixed(2)} | High: $${Number(r.high_price || 0).toFixed(2)} (${r.price_date})`
-        ).join("\n");
-        parts.push(`[PRODUCT SEARCH — ${results.length} results]\n${formatted}`);
+      // Strip question boilerplate so "what is the price of a PSA 10 Charizard"
+      // queries the index as "PSA 10 Charizard", not the whole sentence.
+      const searchTerms = text
+        .replace(/\b(what|whats|what's|is|are|the|current|price|prices|worth|value|of|a|an|how|much|for|tell|me|about|please|can|you|check)\b/gi, " ")
+        .replace(/[^a-zA-Z0-9\s-]/g, "")
+        .replace(/\s+/g, " ")
+        .trim()
+        .slice(0, 100);
+      if (searchTerms.length >= 3) {
+        const data = await oracleFetch(`${ORACLE_SEARCH_ENDPOINT}?query=${encodeURIComponent(searchTerms)}&limit=5`);
+        const results = (data?.data as Record<string, unknown>)?.results as Array<Record<string, unknown>> || [];
+        if (results.length > 0) {
+          const formatted = results.map((r: Record<string, unknown>) => {
+            const price = r.market_price_usd;
+            const priceStr = typeof price === "number"
+              ? `$${price.toLocaleString("en-US", { minimumFractionDigits: 2 })}`
+              : "no market price on file";
+            return `• ${r.name}${r.set ? ` (${r.set})` : ""} — ${priceStr} [product_id ${r.product_id}]`;
+          }).join("\n");
+          parts.push(`[PRODUCT SEARCH — ${results.length} results for "${searchTerms}"]\n${formatted}`);
+        }
       }
     }
 
-    // Market snapshot
+    // Market snapshot — the free forecast board (200 priced cards with
+    // conformal bands). The old /api/v1/market call hit a paid x402 endpoint
+    // with a bare fetch, always got 402, and silently returned nothing.
     if (wantSnapshot) {
-      const data = await oracleFetch(ORACLE_MARKET_ENDPOINT);
-      if (data?.status === "ok") {
-        const mktData = data.data as Record<string, unknown>;
-        const topCards = (mktData?.top_cards as Array<Record<string, unknown>> || []).slice(0, 5);
-        const totalProducts = mktData?.total_products || "?";
-        const withPricing = mktData?.with_pricing || "?";
-
-        if (topCards.length > 0) {
-          const formatted = topCards.map((c: Record<string, unknown>) =>
-            `• ${c.name} — $${Number(c.market_price || 0).toLocaleString("en-US", { minimumFractionDigits: 2 })} (${c.date})`
-          ).join("\n");
-          parts.push(`[MARKET SNAPSHOT — ${data.game || "TCG"}]\nTotal products indexed: ${totalProducts} (${withPricing} with pricing)\nTop cards by market price:\n${formatted}`);
-        }
+      const data = await oracleFetch(`${ORACLE_BASE_URL}/api/v1/forecast`);
+      const cards = (data?.cards as Array<Record<string, unknown>> || []).slice(0, 5);
+      if (cards.length > 0) {
+        const formatted = cards.map((c: Record<string, unknown>) =>
+          `• ${c.name} (${c.game}) — $${Number(c.price || 0).toLocaleString("en-US", { minimumFractionDigits: 2 })}, ` +
+          `${c.horizon}d forecast ${Number(c.move_pct) >= 0 ? "+" : ""}${c.move_pct}% (p(up) ${c.prob_up})`
+        ).join("\n");
+        parts.push(`[MARKET SNAPSHOT — forecast board as of ${data?.as_of}]\n${formatted}`);
       }
     }
 
@@ -1349,7 +1359,12 @@ const MARKET_STOP_WORDS = new Set(["i", "just", "pulled", "a", "an", "the", "fro
   "could", "should", "can", "may", "might", "shall", "it", "its", "this",
   "that", "these", "those", "what", "how", "much", "many", "some", "any",
   "about", "of", "in", "on", "at", "to", "for", "with", "and", "or", "but",
-  "not", "got", "get", "know", "think", "want", "need", "like"]);
+  "not", "got", "get", "know", "think", "want", "need", "like",
+  // price-question boilerplate — leaving these in degraded the oracle query
+  // to generic null-priced matches (audit 2026-08-07)
+  "worth", "price", "prices", "priced", "value", "valued", "cost", "costs",
+  "sell", "selling", "buy", "buying", "going", "market", "current", "currently", "today",
+  "right", "now", "tell", "me", "please", "check", "wondering", "curious"]);
 
 const MARKET_TRIGGERS = [
   "pokemon card", "trading card", "charizard", "pikachu", "magic the gathering",
@@ -1404,9 +1419,13 @@ const marketIntelligenceEvaluator: Evaluator<MarketVerdict, MarketEnrichment> = 
     if (!searchTerms) return { searchTerms: "", products: [], enrichment: "" };
 
     const data = await oracleFetch(`${ORACLE_SEARCH_ENDPOINT}?query=${encodeURIComponent(searchTerms)}&limit=3`);
-    const products = ((data?.data as Record<string, unknown>)?.results as Array<Record<string, unknown>>) || [];
+    // Real response fields: { product_id, name, market_price_usd, set }.
+    // Products without a price are dropped — narrating "$0.00" as live data
+    // is worse than saying nothing (audit 2026-08-07).
+    const products = (((data?.data as Record<string, unknown>)?.results as Array<Record<string, unknown>>) || [])
+      .filter((r) => typeof r.market_price_usd === "number");
     const enrichment = products.map((r: Record<string, unknown>) =>
-      `${r.name}: $${Number(r.market_price || 0).toFixed(2)} market / $${Number(r.mid_price || 0).toFixed(2)} mid (${r.price_date})`
+      `${r.name}${r.set ? ` (${r.set})` : ""}: $${Number(r.market_price_usd).toLocaleString("en-US", { minimumFractionDigits: 2 })} market [product_id ${r.product_id}]`
     ).join("; ");
     return { searchTerms, products, enrichment };
   },

@@ -1,5 +1,20 @@
 # Changelog
 
+## 2.6.1 — 2026-08-07
+
+Live-path audit fixes. 2.6.0's oracle integrations read response fields that do
+not exist, so the provider and evaluator narrated "$0.00 (undefined)" into
+agent context as real market data, and the market-snapshot branch silently
+called a paid x402 endpoint with a bare fetch (always 402, never any data).
+
+- Oracle search mapping fixed: `market_price_usd` + `set` + `product_id`
+  (the real response shape); null-priced products dropped instead of shown as $0.00
+- Market snapshot now uses the free forecast board (`/api/v1/forecast`,
+  200 priced cards with conformal bands) instead of the paid `/api/v1/market`
+- Price-question boilerplate ("worth", "price", "current", ...) stripped from
+  outbound oracle queries so the index matches the card, not the sentence
+- 2 regression tests pin the mapping and ban the retired fields (13 total)
+
 All notable changes to this project will be documented in this file.
 
 ## [2.0.3] - 2026-05-10
