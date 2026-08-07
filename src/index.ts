@@ -1,5 +1,5 @@
 /**
- * The Undesirables — ElizaOS Plugin v2.5
+ * The Undesirables — ElizaOS Plugin v2.6
  * ========================================
  * Pioneers "Personality-as-Code" via verifiable soul workspaces.
  * Each of 4,444 NFTs generates a unique AI personality from its visual traits.
@@ -54,7 +54,7 @@ const ORACLE_BASE_URL = "https://oracle.the-undesirables.com";
 const ORACLE_SEARCH_ENDPOINT = `${ORACLE_BASE_URL}/api/v1/search`;
 const ORACLE_MARKET_ENDPOINT = `${ORACLE_BASE_URL}/api/v1/market`;
 const SCATTER_MINT_URL = "https://scatter.art/the-undesirables";
-const PLUGIN_VERSION = "2.5.0";
+const PLUGIN_VERSION = "2.6.0";
 const COLLECTION_TOTAL = 4444;
 const MINTED_COUNT = 273;
 
@@ -1330,96 +1330,135 @@ Website: https://the-undesirables.com${demoNotice}`,
  * This is what makes the plugin "ambient intelligence" — the agent
  * becomes market-aware without anyone explicitly calling an action.
  */
-const marketIntelligenceEvaluator: Evaluator = {
+/** What `prepare` gathers: deterministic Oracle data, fetched once per run. */
+type MarketEnrichment = {
+  searchTerms: string;
+  products: Array<Record<string, unknown>>;
+  enrichment: string;
+};
+
+/** What the model returns under `schema`. Advisory only — the numbers the
+ *  agent sees always come from `prepared`, never from the model. */
+type MarketVerdict = {
+  relevant: boolean;
+  note: string;
+};
+
+const MARKET_STOP_WORDS = new Set(["i", "just", "pulled", "a", "an", "the", "from", "my", "is", "was",
+  "are", "been", "have", "has", "had", "do", "does", "did", "will", "would",
+  "could", "should", "can", "may", "might", "shall", "it", "its", "this",
+  "that", "these", "those", "what", "how", "much", "many", "some", "any",
+  "about", "of", "in", "on", "at", "to", "for", "with", "and", "or", "but",
+  "not", "got", "get", "know", "think", "want", "need", "like"]);
+
+const MARKET_TRIGGERS = [
+  "pokemon card", "trading card", "charizard", "pikachu", "magic the gathering",
+  "yugioh card", "yu-gi-oh", "tcg", "psa grade", "psa 10", "beckett grade",
+  "bgs grade", "cgc grade", "card grading", "booster pack", "booster box",
+  "sealed product", "holographic card", "holo rare",
+  "first edition card", "1st edition card", "gem mint", "mint condition card",
+];
+
+const extractSearchTerms = (text: string): string =>
+  text
+    .replace(/[^a-zA-Z0-9\s-]/g, "")
+    .split(/\s+/)
+    .filter(w => w.length > 1 && !MARKET_STOP_WORDS.has(w.toLowerCase()))
+    .join(" ")
+    .trim()
+    .slice(0, 80);
+
+const marketIntelligenceEvaluator: Evaluator<MarketVerdict, MarketEnrichment> = {
   name: "UNDESIRABLE_MARKET_INTELLIGENCE",
   description:
     "Passively monitors conversations for market-related topics and enriches " +
     "agent context with live TCG market data from the Oracle API.",
-  alwaysRun: true,
   similes: [
     "MARKET_ENRICHMENT",
     "PRICE_CONTEXT",
     "TCG_AWARENESS",
   ],
-  examples: [
-    {
-      prompt: "User mentions a specific trading card by name in conversation",
-      messages: [
-        { name: "{{user1}}", content: { text: "I just pulled a Charizard from a pack!" } } as ActionExample,
-        { name: "{{agentName}}", content: { text: "That's a great pull! Based on current market data..." } } as ActionExample,
-      ],
-      outcome: "The evaluator detected a TCG card mention and enriched the response with live Charizard pricing data from oracle.the-undesirables.com.",
+
+  // The model may only choose whether the enrichment is worth surfacing and
+  // phrase a one-line note. It is never asked to produce a price.
+  schema: {
+    type: "object",
+    properties: {
+      relevant: { type: "boolean", description: "Is the live market data worth surfacing to the user?" },
+      note: { type: "string", description: "One short sentence of context. Do not invent numbers." },
     },
-  ],
-  validate: async (_runtime: IAgentRuntime, message: Memory): Promise<boolean> => {
+    required: ["relevant", "note"],
+    additionalProperties: false,
+  },
+
+  shouldRun: async ({ message }): Promise<boolean> => {
     const text = message?.content?.text?.toLowerCase() || "";
     if (text.length < 10) return false;
-
-    // Use multi-word phrases to avoid false positives on common words
-    const triggerKeywords = [
-      "pokemon card", "trading card", "charizard", "pikachu", "magic the gathering",
-      "yugioh card", "yu-gi-oh", "tcg", "psa grade", "psa 10", "beckett grade",
-      "bgs grade", "cgc grade", "card grading", "booster pack", "booster box",
-      "sealed product", "holographic card", "holo rare",
-      "first edition card", "1st edition card", "gem mint", "mint condition card",
-    ];
-    return triggerKeywords.some(kw => text.includes(kw));
+    // Multi-word phrases avoid false positives on common words.
+    return MARKET_TRIGGERS.some(kw => text.includes(kw));
   },
-  handler: async (
-    runtime: IAgentRuntime,
-    message: Memory,
-    _state?: State,
-    _options?: Record<string, unknown>,
-    callback?: HandlerCallback
-  ): Promise<ActionResult | undefined> => {
+
+  prepare: async ({ message }): Promise<MarketEnrichment> => {
     const text = message?.content?.text || "";
+    const searchTerms = extractSearchTerms(text);
+    if (!searchTerms) return { searchTerms: "", products: [], enrichment: "" };
 
-    // Extract likely card/product names instead of sending the full sentence
-    // Remove common conversational words, keep nouns and proper names
-    const stopWords = new Set(["i", "just", "pulled", "a", "an", "the", "from", "my", "is", "was",
-      "are", "been", "have", "has", "had", "do", "does", "did", "will", "would",
-      "could", "should", "can", "may", "might", "shall", "it", "its", "this",
-      "that", "these", "those", "what", "how", "much", "many", "some", "any",
-      "about", "of", "in", "on", "at", "to", "for", "with", "and", "or", "but",
-      "not", "got", "get", "got", "know", "think", "want", "need", "like"]);
-    const searchTerms = text
-      .replace(/[^a-zA-Z0-9\s-]/g, "")
-      .split(/\s+/)
-      .filter(w => w.length > 1 && !stopWords.has(w.toLowerCase()))
-      .join(" ")
-      .trim()
-      .slice(0, 80);
-
-    if (!searchTerms) {
-      return { success: true, text: "Could not extract card name from message." };
-    }
     const data = await oracleFetch(`${ORACLE_SEARCH_ENDPOINT}?query=${encodeURIComponent(searchTerms)}&limit=3`);
-    const results = (data?.data as Record<string, unknown>)?.results as Array<Record<string, unknown>> || [];
-
-    if (results.length === 0) {
-      return { success: true, text: "No matching products found in Oracle index." };
-    }
-
-    const enrichment = results.map((r: Record<string, unknown>) =>
+    const products = ((data?.data as Record<string, unknown>)?.results as Array<Record<string, unknown>>) || [];
+    const enrichment = products.map((r: Record<string, unknown>) =>
       `${r.name}: $${Number(r.market_price || 0).toFixed(2)} market / $${Number(r.mid_price || 0).toFixed(2)} mid (${r.price_date})`
     ).join("; ");
+    return { searchTerms, products, enrichment };
+  },
 
-    console.log(`[Undesirables Evaluator] Enriched context with ${results.length} products: ${enrichment.slice(0, 100)}...`);
+  prompt: ({ prepared }): string =>
+    prepared.products.length
+      ? `Live market data from the Undesirables Oracle for "${prepared.searchTerms}":\n${prepared.enrichment}\n\n` +
+        `Decide whether this is worth surfacing to the user and write one short sentence of context. ` +
+        `Use ONLY the figures above — never estimate or invent a price. If nothing here is relevant, set relevant to false.`
+      : `No Oracle match was found for this message. Set relevant to false.`,
 
-    if (callback) {
-      await callback({
-        text: `📊 Market context: ${enrichment}`,
-        source: "plugin-undesirables-evaluator",
-      });
-    }
-
+  parse: (output: unknown): MarketVerdict | null => {
+    const o = output as Record<string, unknown> | null;
+    if (!o || typeof o !== "object") return null;
     return {
-      success: true,
-      text: `Enriched with ${results.length} live market prices`,
-      data: { products: results.length, enrichment },
+      relevant: Boolean(o.relevant),
+      note: typeof o.note === "string" ? o.note : "",
     };
   },
+
+  processors: [
+    {
+      name: "emit-market-context",
+      process: async ({ prepared, output, options }): Promise<ActionResult | undefined> => {
+        // The enrichment is deterministic Oracle data. The model's verdict only
+        // gates whether we speak up — it can never change the numbers.
+        if (!prepared.products.length) {
+          return { success: true, text: "No matching products found in Oracle index." };
+        }
+        if (output && output.relevant === false) {
+          return { success: true, text: "Oracle data fetched but judged not relevant." };
+        }
+
+        console.log(`[Undesirables Evaluator] Enriched context with ${prepared.products.length} products: ${prepared.enrichment.slice(0, 100)}...`);
+
+        if (options?.callback) {
+          await options.callback({
+            text: `📊 Market context: ${prepared.enrichment}`,
+            source: "plugin-undesirables-evaluator",
+          });
+        }
+
+        return {
+          success: true,
+          text: `Enriched with ${prepared.products.length} live market prices`,
+          data: { products: prepared.products.length, enrichment: prepared.enrichment },
+        };
+      },
+    },
+  ],
 };
+
 
 // ============================================================
 // PLUGIN EXPORT
