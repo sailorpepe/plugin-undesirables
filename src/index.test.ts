@@ -224,4 +224,39 @@ describe("plugin-undesirables", () => {
       expect(sourceCode).toContain("new Map<string, SoulWorkspace>()");
     });
   });
+
+  describe("Oracle field mapping (audit 2026-08-07)", () => {
+    it("evaluator prepare maps market_price_usd and drops null-priced products", async () => {
+      const mod = await import("./index.js");
+      const ev = (mod.default as any).evaluators[0];
+      const realFetch = globalThis.fetch;
+      globalThis.fetch = (async () => ({
+        ok: true, status: 200,
+        json: async () => ({ status: "ok", data: { results: [
+          { product_id: 84198, name: "Charizard Star (Delta Species)", market_price_usd: 4000, set: "Dragon Frontiers" },
+          { product_id: 611493, name: "Charizard Star (Delta Species)", market_price_usd: null, set: null },
+        ]}}),
+      })) as any;
+      try {
+        const prepared = await ev.prepare({ message: { content: { text: "how much is a charizard star delta species worth?" } } });
+        expect(prepared.products).toHaveLength(1); // null-priced dropped
+        expect(prepared.enrichment).toContain("$4,000.00");
+        expect(prepared.enrichment).toContain("Dragon Frontiers");
+        expect(prepared.enrichment).not.toContain("$0.00");
+        expect(prepared.enrichment).not.toContain("undefined");
+        // price-question boilerplate stripped from the outbound query
+        expect(prepared.searchTerms).not.toMatch(/\b(worth|price|current|much)\b/i);
+        expect(prepared.searchTerms.toLowerCase()).toContain("charizard");
+      } finally { globalThis.fetch = realFetch; }
+    });
+
+    it("source no longer reads retired oracle fields", async () => {
+      const fs = await import("fs");
+      const src = fs.readFileSync(new URL("./index.ts", import.meta.url), "utf8");
+      for (const dead of ["r.market_price ", "r.mid_price", "r.low_price", "r.high_price", "r.price_date", "top_cards"]) {
+        expect(src.includes(dead), `stale field read: ${dead}`).toBe(false);
+      }
+      expect(src).toContain("market_price_usd");
+    });
+  });
 });
