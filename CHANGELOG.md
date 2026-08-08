@@ -1,5 +1,20 @@
 # Changelog
 
+## 2.7.0 — 2026-08-07
+
+Souls now show their receipts. Two read-only actions expose the on-chain
+prediction track record that already existed but was invisible to agents:
+
+- `UNDESIRABLE_SOUL_RATING` — a soul's graded record: letter rating, hit rate
+  vs baseline, skill, Brier, recent graded calls (defaults to the loaded
+  soul's own token; accepts token_id or "soul N" in the message)
+- `UNDESIRABLE_SOUL_LEADERBOARD` — 251 rated souls ranked, plus the latest
+  Merkle-locked prediction batch (root + tx, graded after 30-day maturity)
+
+Both wrap the free /api/v1/soul-rating endpoints. No auth, no payment path.
+Every call was locked on-chain before its outcome — the record is falsifiable,
+not claimed.
+
 ## 2.6.1 — 2026-08-07
 
 Live-path audit fixes. 2.6.0's oracle integrations read response fields that do

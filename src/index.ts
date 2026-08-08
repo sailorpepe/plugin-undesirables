@@ -1483,6 +1483,125 @@ const marketIntelligenceEvaluator: Evaluator<MarketVerdict, MarketEnrichment> = 
 // PLUGIN EXPORT
 // ============================================================
 
+// ============================================================
+// Soul Rating — the on-chain track record (v2.7)
+// ============================================================
+// Souls don't just have personalities; they make weekly price predictions
+// that are Merkle-locked on-chain BEFORE outcomes and publicly graded after
+// a 30-day maturity. These two actions expose that record from the free
+// endpoints. Read-only, no auth, no payment path.
+
+const SOUL_RATING_ENDPOINT = `${ORACLE_BASE_URL}/api/v1/soul-rating`;
+
+const soulRatingAction: Action = {
+  name: "UNDESIRABLE_SOUL_RATING",
+  description:
+    "Fetch a soul's public, on-chain-graded prediction track record: letter rating, hit rate vs baseline, skill, Brier score, and recent graded calls. Defaults to the loaded soul's own token.",
+  similes: ["SOUL_TRACK_RECORD", "MY_RATING", "SOUL_SCORE", "PREDICTION_RECORD"],
+  parameters: [
+    {
+      name: "token_id",
+      description: "Undesirable token id (1-4444). Omit to use the loaded soul's own token.",
+      required: false,
+      schema: { type: "number" },
+    },
+  ],
+  examples: [
+    [
+      { name: "{{user1}}", content: { text: "What's your prediction track record?" } } as ActionExample,
+      { name: "{{agentName}}", content: { text: "Pulling my graded record from the oracle...", action: "UNDESIRABLE_SOUL_RATING" } } as ActionExample,
+    ],
+    [
+      { name: "{{user1}}", content: { text: "How good is soul 42 at calling the market?" } } as ActionExample,
+      { name: "{{agentName}}", content: { text: "Checking soul 42's on-chain record...", action: "UNDESIRABLE_SOUL_RATING" } } as ActionExample,
+    ],
+  ],
+  validate: async () => true,
+  handler: async (
+    runtime: IAgentRuntime,
+    message: Memory,
+    _state?: State,
+    options?: Record<string, unknown>,
+    callback?: HandlerCallback
+  ): Promise<ActionResult | undefined> => {
+    const workspace = getWorkspace(runtime);
+    const fromMsg = message.content.text?.match(/\b(?:soul|token)\s*#?\s*(\d{1,4})\b/i)?.[1];
+    const tokenId = Number(options?.token_id ?? fromMsg ?? workspace?.meta?.token_id);
+    if (!Number.isInteger(tokenId) || tokenId < 1 || tokenId > COLLECTION_TOTAL) {
+      const text = "No token id — pass token_id (1-4444) or load a soul workspace first.";
+      if (callback) await callback({ text });
+      return { success: false, text };
+    }
+    try {
+      const d = await oracleFetch(`${SOUL_RATING_ENDPOINT}/${tokenId}`);
+      if (d?.status !== "ok") {
+        const text = `Soul ${tokenId} has no rating yet — fewer than 3 matured predictions, or not minted.`;
+        if (callback) await callback({ text });
+        return { success: true, text, data: { token_id: tokenId, rated: false } };
+      }
+      const recent = (d.recent_results as Array<Record<string, unknown>> || []).slice(0, 5);
+      const lines = [
+        `Soul ${tokenId} — rating ${d.rating} (${d.matured} matured calls)`,
+        `Hit rate ${(Number(d.hit_rate) * 100).toFixed(1)}% vs baseline ${(Number(d.baseline_rate) * 100).toFixed(1)}% — skill ${Number(d.skill) >= 0 ? "+" : ""}${(Number(d.skill) * 100).toFixed(1)}pts. Brier ${d.brier}.`,
+        ...(d.rating_note ? [String(d.rating_note)] : []),
+        ...(recent.length
+          ? ["Recent graded calls:", ...recent.map((r) => `  • ${r.name}: called ${r.direction}, moved ${Number(r.move_pct) >= 0 ? "+" : ""}${r.move_pct}% → ${String(r.outcome).toUpperCase()}`)]
+          : []),
+        `Every call was Merkle-locked on-chain before its outcome. Verify: ${SOUL_RATING_ENDPOINT}/${tokenId}`,
+      ];
+      const text = lines.join("\n");
+      if (callback) await callback({ text });
+      return { success: true, text, data: { rating: d } };
+    } catch (e) {
+      const text = `Could not reach the rating board: ${e instanceof Error ? e.message : String(e)}`;
+      if (callback) await callback({ text });
+      return { success: false, text };
+    }
+  },
+};
+
+const soulLeaderboardAction: Action = {
+  name: "UNDESIRABLE_SOUL_LEADERBOARD",
+  description:
+    "The soul rating leaderboard — every rated Undesirable soul ranked by its on-chain-graded prediction record, plus the latest Merkle-locked prediction batch.",
+  similes: ["SOUL_RANKINGS", "TOP_SOULS", "RATING_BOARD", "BEST_PREDICTORS"],
+  parameters: [],
+  examples: [
+    [
+      { name: "{{user1}}", content: { text: "Which souls have the best track records?" } } as ActionExample,
+      { name: "{{agentName}}", content: { text: "Pulling the soul rating board...", action: "UNDESIRABLE_SOUL_LEADERBOARD" } } as ActionExample,
+    ],
+  ],
+  validate: async () => true,
+  handler: async (
+    _runtime: IAgentRuntime,
+    _message: Memory,
+    _state?: State,
+    _options?: Record<string, unknown>,
+    callback?: HandlerCallback
+  ): Promise<ActionResult | undefined> => {
+    try {
+      const d = await oracleFetch(SOUL_RATING_ENDPOINT);
+      const rated = (d?.rated as Array<Record<string, unknown>> || []);
+      const top = [...rated].sort((a, b) => Number(b.hit_rate) - Number(a.hit_rate) || Number(a.brier) - Number(b.brier)).slice(0, 10);
+      const lock = d?.latest_lock as Record<string, unknown> | undefined;
+      const lines = [
+        `Soul rating board — ${rated.length} rated souls (universe: ${d?.minted_universe})`,
+        `Scale: ${d?.rating_scale}`,
+        ...top.map((s, i) => `${i + 1}. Soul ${s.token_id} — ${s.rating} | ${(Number(s.hit_rate) * 100).toFixed(0)}% over ${s.matured} matured | Brier ${s.brier}`),
+        ...(lock ? [`Latest lock: ${lock.n_predictions} predictions, as_of ${lock.as_of}, Merkle root ${String(lock.merkle_root).slice(0, 16)}… (on-chain, graded after 30-day maturity)`] : []),
+      ];
+      const text = lines.join("\n");
+      if (callback) await callback({ text });
+      return { success: true, text, data: { rated: top, latest_lock: lock } };
+    } catch (e) {
+      const text = `Could not reach the rating board: ${e instanceof Error ? e.message : String(e)}`;
+      if (callback) await callback({ text });
+      return { success: false, text };
+    }
+  },
+};
+
 const undesirablePlugin: Plugin = {
   name: "plugin-undesirables",
   description:
@@ -1510,6 +1629,8 @@ const undesirablePlugin: Plugin = {
     portfolioCheckAction,
     exitStrategyAction,
     riskAssessmentAction,
+    soulRatingAction,
+    soulLeaderboardAction,
   ],
   providers: [oracleProvider, soulProvider],
   evaluators: [marketIntelligenceEvaluator],
