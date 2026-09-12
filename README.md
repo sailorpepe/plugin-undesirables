@@ -64,7 +64,7 @@ The Undesirables ecosystem has three tiers. The plugin is the free entry point.
 │  ✓ Demo soul (loads automatically, zero config)          │
 │  ✓ All 16 live-data skills (DeFiLlama + Etherscan)    │
 │  ✓ 9 personality-driven actions                          │
-│  ✓ Live Oracle data (search + daily market snapshot)     │
+│  ✓ Oracle data (search; USD prices frozen 2026-09-07)   │
 │  ✓ Passive market intelligence evaluator                 │
 │  ✓ NFT holder souls (unique personality + memory)        │
 ├──────────────────────────────────────────────────────────┤
@@ -76,7 +76,6 @@ The Undesirables ecosystem has three tiers. The plugin is the free entry point.
 │  $0.05  NFT floor price oracle + forecast                │
 │  $0.05  Token price simulation (CoinGecko + Monte Carlo) │
 │  $1.00  Cross-platform prediction market arbitrage       │
-│  $0.50  Multi-outcome basket arbitrage                   │
 │  $0.25  Weather derivatives edge scanning                │
 ├──────────────────────────────────────────────────────────┤
 │  MCP SERVER (pip install undesirables-mcp-server)        │
@@ -144,7 +143,7 @@ Your agent gets a unique personality derived from your NFT's visual traits — B
 
 | Provider | What It Does |
 |----------|-------------|
-| `undesirables-oracle` | Fetches live product prices from 446K+ indexed TCG products and daily market snapshots. Triggers automatically when the conversation mentions cards, prices, or market topics. |
+| `undesirables-oracle` | Fetches product data from 456K+ indexed TCG products — USD prices are frozen at 2026-09-07 and responses carry `usd_panel {frozen}`; the market snapshot is suspended while frozen. Triggers automatically when the conversation mentions cards, prices, or market topics. |
 | `undesirables-soul` | Injects the agent's personality context into every response. Loads demo soul by default or the NFT holder's unique soul when configured. |
 
 ### Evaluators (1)
@@ -187,7 +186,7 @@ All 16 skills are available to every user — demo and NFT holder alike. Financi
 
 | API | Auth | What It Provides | Skills Powered |
 |-----|------|-----------------|----------------|
-| **Oracle API** | None (free) | 446K+ TCG product prices, daily market snapshots | Market Analysis |
+| **Oracle API** | None (free) | 456K+ TCG products (USD prices frozen 2026-09-07; market snapshot suspended); Japanese two-sided quotes and graded asks refresh daily | Market Analysis |
 | **DeFiLlama** | None (free) | Yield pool APYs, protocol TVL, token prices | Entry Signal, Exit Strategy, Farm Yield, Risk Assessment, Conviction Score, Compound Strategy |
 | **Etherscan V2** | Free API key | On-chain wallet balances, transaction history | Portfolio Check, Whale Tracker, Rebalance Check |
 
@@ -212,7 +211,7 @@ All 16 skills are available to every user — demo and NFT holder alike. Financi
 Skills are the distribution. Personality is the NFT value.
 
 - **4,444** total souls on Ethereum
-- **273** minted
+- **274** minted (read the live count from `GET /` → `total_minted`)
 - **4,171** unclaimed at [scatter.art/the-undesirables](https://scatter.art/the-undesirables)
 
 ---
