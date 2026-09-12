@@ -18,7 +18,7 @@ Paste into any MCP client (Claude, Cursor, ChatGPT) — free card search & forec
 [![MCP Server](https://img.shields.io/badge/MCP_Server-35+_Tools-green.svg)](https://github.com/sailorpepe/undesirables-mcp-server)
 [![x402](https://img.shields.io/badge/x402-Oracle_API-orange.svg)](https://oracle.the-undesirables.com)
 
-> Personality-as-Code for ElizaOS agents. Live market data from 446K+ indexed products. Zero config required.
+> Personality-as-Code for ElizaOS agents. Live market data from 456K+ indexed products. Zero config required.
 
 ---
 
@@ -46,7 +46,7 @@ Paste into any MCP client (Claude, Cursor, ChatGPT) — free card search & forec
 Install the plugin, and your agent immediately gets:
 
 - **A working personality** — a demo soul loads automatically. NFT holders get their unique AI identity.
-- **Live market data** — real product prices from 446K+ indexed TCG products, DeFi yields from DeFiLlama, on-chain balances from Etherscan.
+- **Live market data** — real product prices from 456K+ indexed TCG products, DeFi yields from DeFiLlama, on-chain balances from Etherscan.
 - **16 live-data skills** — market analysis, portfolio checks, entry signals, exit strategies, risk assessment, yield farming, content creation, and more. All financial skills fetch real data.
 - **Passive market intelligence** — an evaluator that detects card/market topics and enriches the agent's context with live pricing data automatically.
 
