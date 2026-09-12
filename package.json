@@ -1,7 +1,7 @@
 {
   "name": "plugin-undesirables",
   "version": "2.7.0",
-  "description": "ElizaOS plugin — Personality-as-Code for AI agents. 16 live-data skills powered by DeFiLlama + Etherscan + Oracle API (446K+ TCG products). 9 actions, zero-config demo soul. NFT holders get unique Big Five psychology profiles with persistent memory. Not financial advice.",
+  "description": "ElizaOS plugin — Personality-as-Code for AI agents. 16 live-data skills powered by DeFiLlama + Etherscan + Oracle API (456K+ TCG products; USD prices frozen 2026-09-07). 9 actions, zero-config demo soul. NFT holders get unique Big Five psychology profiles with persistent memory. Not financial advice.",
   "main": "dist/index.js",
   "module": "dist/index.js",
   "types": "dist/index.d.ts",
