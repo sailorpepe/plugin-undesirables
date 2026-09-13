@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.7.1 — 2026-09-12
+
+- README and package description: USD prices are frozen at 2026-09-07 (responses carry `usd_panel`); market snapshot / simulate / trending actions are suspended and answer `{"status":"suspended"}` without charging; product count 456K+.
+
 ## 2.7.0 — 2026-08-07
 
 Souls now show their receipts. Two read-only actions expose the on-chain
