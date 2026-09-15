@@ -11,7 +11,7 @@
  *
  * Features:
  * - 10 actions + 16 live-data skills (DeFiLlama, Etherscan, Oracle API)
- * - Live Oracle provider (real market data from 446K+ products)
+ * - Live Oracle provider (455K+ products; Japanese two-sided board + sports board live, USD panel frozen 2026-09-07)
  * - Demo soul for non-holders (drives mint conversion)
  * - Market analysis with personality-driven perspective
  * - Business Pilot — 23 AI-powered business modules
@@ -53,7 +53,7 @@ import { MemeTrendService } from "./services.js";
 const ORACLE_BASE_URL = "https://oracle.the-undesirables.com";
 const ORACLE_SEARCH_ENDPOINT = `${ORACLE_BASE_URL}/api/v1/search`;
 const SCATTER_MINT_URL = "https://scatter.art/the-undesirables";
-const PLUGIN_VERSION = "2.6.0";
+const PLUGIN_VERSION = "2.7.2";
 const COLLECTION_TOTAL = 4444;
 const MINTED_COUNT = 273;
 
@@ -1175,13 +1175,15 @@ async function fetchSkillData(
  * Oracle Provider — Fetches live TCG market data from free endpoints.
  * Available to ALL plugin users (no auth, no cost).
  *
- * Two data sources:
- * - /api/v1/search — product-specific pricing (triggered by card/market keywords)
- * - /api/v1/market — daily market snapshot with top cards and totals
+ * Data sources (all free, no auth):
+ * - /api/v1/search — product lookup (last published USD price, labelled frozen since 2026-09-07)
+ * - /api/v1/jp/summary — the live daily "market snapshot": Japanese two-sided dealer board aggregates
+ * - /api/v1/sports/board — daily sports movers board (triggered by sports keywords)
+ * /api/v1/market is SUSPENDED (frozen USD panel) and is no longer called.
  */
 const oracleProvider: Provider = {
   name: "undesirables-oracle",
-  description: "Live TCG market intelligence from the Undesirables Oracle API (446K+ products, real prices, daily snapshots)",
+  description: "Live TCG market intelligence from the Undesirables Oracle API (455K+ products, Japanese two-sided board and sports movers refreshed daily; USD panel frozen 2026-09-07 and labelled)",
   get: async (runtime: IAgentRuntime, message: Memory, _state: State): Promise<ProviderResult> => {
     const text = message?.content?.text || "";
     if (!text || text.length < 3) {
@@ -1194,12 +1196,16 @@ const oracleProvider: Provider = {
       "yu-gi-oh", "tcg price", "psa grade", "beckett grade", "bgs grade",
       "cgc grade", "card worth", "card value", "booster box"];
     const marketKeywords = ["tcg market", "card market", "top cards", "most expensive card",
-      "market snapshot", "market overview", "trading card market"];
+      "market snapshot", "market overview", "trading card market", "japanese market",
+      "japanese cards", "jp market", "dealer board"];
+    const sportsKeywords = ["sports board", "sports cards", "hot players", "movers board",
+      "mlb ", "nfl ", "nba ", "nhl ", "ncaaf", "ncaab", "wnba"];
 
     const wantSearch = searchKeywords.some(kw => lower.includes(kw));
     const wantSnapshot = marketKeywords.some(kw => lower.includes(kw));
+    const wantSports = sportsKeywords.some(kw => lower.includes(kw));
 
-    if (!wantSearch && !wantSnapshot) {
+    if (!wantSearch && !wantSnapshot && !wantSports) {
       return { text: "" };
     }
 
@@ -1233,18 +1239,52 @@ const oracleProvider: Provider = {
       }
     }
 
-    // Market snapshot — the free forecast board (200 priced cards with
-    // conformal bands). The old /api/v1/market call hit a paid x402 endpoint
-    // with a bare fetch, always got 402, and silently returned nothing.
+    // Market snapshot — the LIVE feed is the Japanese two-sided dealer board
+    // (bid + ask, yen), published daily as aggregates. The USD forecast board
+    // froze 2026-09-07, so it is no longer narrated as a current snapshot.
+    // (Earlier: /api/v1/market — paid, always 402 on a bare fetch; then
+    // /api/v1/forecast — frozen USD. Re-pointed 2026-09-15.)
     if (wantSnapshot) {
-      const data = await oracleFetch(`${ORACLE_BASE_URL}/api/v1/forecast`);
-      const cards = (data?.cards as Array<Record<string, unknown>> || []).slice(0, 5);
-      if (cards.length > 0) {
-        const formatted = cards.map((c: Record<string, unknown>) =>
-          `• ${c.name} (${c.game}) — $${Number(c.price || 0).toLocaleString("en-US", { minimumFractionDigits: 2 })}, ` +
-          `${c.horizon}d forecast ${Number(c.move_pct) >= 0 ? "+" : ""}${c.move_pct}% (p(up) ${c.prob_up})`
-        ).join("\n");
-        parts.push(`[MARKET SNAPSHOT — forecast board as of ${data?.as_of}]\n${formatted}`);
+      const data = await oracleFetch(`${ORACLE_BASE_URL}/api/v1/jp/summary`);
+      const t = (data?.totals as Record<string, unknown>) || {};
+      const dod = ((data?.movement as Record<string, unknown>)?.day_over_day as Record<string, unknown>) || {};
+      const bands = (data?.bands as Array<Record<string, unknown>>) || [];
+      if (t.cards) {
+        const bandStr = bands.slice(0, 8).map((b: Record<string, unknown>) =>
+          `¥${b.ask_yen_from}–${b.ask_yen_to}: ${Number(b.cards || 0).toLocaleString("en-US")} cards`).join(", ");
+        parts.push(
+          `[JAPANESE TWO-SIDED BOARD — as of ${data?.as_of}]\n` +
+          `• ${Number(t.cards).toLocaleString("en-US")} cards / ${t.sets} sets / ${t.games} games; ` +
+          `${Number(t.two_sided).toLocaleString("en-US")} carry both a dealer bid and an ask (${Math.round(Number(t.two_sided_share || 0) * 100)}%)\n` +
+          `• median ask ¥${t.median_ask_yen}; median bid/ask on two-sided cards ${t.median_bid_over_ask_two_sided}\n` +
+          `• day-over-day: ${dod.asks_changed ?? 0} asks moved (${dod.up ?? 0} up / ${dod.down ?? 0} down), ` +
+          `median move among movers ${dod.median_abs_move_pct_among_movers ?? "n/a"}%` +
+          (bandStr ? `\n• ask bands: ${bandStr}` : "") +
+          `\n(USD panel frozen since 2026-09-07 — do not quote USD prices as current.)`
+        );
+      }
+    }
+
+    // Sports movers board — hot players per live league with 7-day conformal context.
+    if (wantSports) {
+      const data = await oracleFetch(`${ORACLE_BASE_URL}/api/v1/sports/board`);
+      const leagues = (data?.leagues as Record<string, Record<string, unknown>>) || {};
+      const asked = Object.keys(leagues).filter(l => lower.includes(l));
+      const show = (asked.length ? asked : Object.keys(leagues)).slice(0, 3);
+      const lines: string[] = [];
+      for (const l of show) {
+        const movers = (leagues[l]?.movers as Array<Record<string, unknown>>) || [];
+        const top = movers.slice(0, 3).map((m: Record<string, unknown>) => {
+          const f = (m.forecast_7d as Record<string, unknown>) || {};
+          const heat = (m.heat as Record<string, unknown>) || {};
+          return `${m.name} (${m.team}, ${m.position}) — ${m.primary_stat} 7d ${f.pred_7d} [${f.lo_7d}–${f.hi_7d}], heat ${heat.grade}`;
+        });
+        if (top.length) lines.push(`${l.toUpperCase()} (${leagues[l]?.data_date}):\n  • ${top.join("\n  • ")}`);
+        else lines.push(`${l.toUpperCase()}: ${leagues[l]?.status || "no board"}${leagues[l]?.reason ? ` — ${leagues[l].reason}` : ""}`);
+      }
+      if (lines.length) {
+        const cal = (data?.calibration as Record<string, unknown>) || {};
+        parts.push(`[SPORTS MOVERS BOARD — ${data?.horizon_days || 7}-day horizon, calibration ${cal.verdict || "n/a"}]\n${lines.join("\n")}`);
       }
     }
 
@@ -1253,7 +1293,7 @@ const oracleProvider: Provider = {
     }
 
     return {
-      text: `[ORACLE — LIVE MARKET DATA]\nSource: oracle.the-undesirables.com\n\n${parts.join("\n\n")}\n\nThis is real market data from live indexes. Use it to inform your response.`,
+      text: `[ORACLE — LIVE MARKET DATA]\nSource: oracle.the-undesirables.com\n\n${parts.join("\n\n")}\n\nThis is real data from live indexes (USD prices are the last published, frozen 2026-09-07 — say so if you cite one). Use it to inform your response.`,
     };
   },
 };
@@ -1607,7 +1647,7 @@ const undesirablePlugin: Plugin = {
   description:
     "The Undesirables — 4,444 autonomous AI agents on Ethereum. " +
     "Pioneers 'Personality-as-Code' via verifiable soul workspaces. " +
-    "Live TCG Oracle data (446K+ products), daily market snapshots, " +
+    "Live TCG Oracle data (455K+ products, Japanese two-sided board + sports movers daily), " +
     "passive market intelligence evaluator, personality-driven analysis, " +
     "and 24 skill matchers. Zero config required — demo soul included.",
   init: async (config: Record<string, string>, runtime: IAgentRuntime) => {

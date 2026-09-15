@@ -143,7 +143,7 @@ Your agent gets a unique personality derived from your NFT's visual traits — B
 
 | Provider | What It Does |
 |----------|-------------|
-| `undesirables-oracle` | Fetches product data from 456K+ indexed TCG products — USD prices are frozen at 2026-09-07 and responses carry `usd_panel {frozen}`; the market snapshot is suspended while frozen. Triggers automatically when the conversation mentions cards, prices, or market topics. |
+| `undesirables-oracle` | Product lookup across 456K+ indexed TCG products (USD prices frozen at 2026-09-07, labelled in-band), the live Japanese two-sided dealer board summary as the market snapshot, and the daily sports movers board. Triggers automatically when the conversation mentions cards, prices, the market, or a league. |
 | `undesirables-soul` | Injects the agent's personality context into every response. Loads demo soul by default or the NFT holder's unique soul when configured. |
 
 ### Evaluators (1)
@@ -186,7 +186,7 @@ All 16 skills are available to every user — demo and NFT holder alike. Financi
 
 | API | Auth | What It Provides | Skills Powered |
 |-----|------|-----------------|----------------|
-| **Oracle API** | None (free) | 456K+ TCG products (USD prices frozen 2026-09-07; market snapshot suspended); Japanese two-sided quotes and graded asks refresh daily | Market Analysis |
+| **Oracle API** | None (free) | 456K+ TCG products (USD prices frozen 2026-09-07); Japanese two-sided board summary, sports movers board and graded asks refresh daily | Market Analysis |
 | **DeFiLlama** | None (free) | Yield pool APYs, protocol TVL, token prices | Entry Signal, Exit Strategy, Farm Yield, Risk Assessment, Conviction Score, Compound Strategy |
 | **Etherscan V2** | Free API key | On-chain wallet balances, transaction history | Portfolio Check, Whale Tracker, Rebalance Check |
 
