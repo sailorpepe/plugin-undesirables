@@ -1280,7 +1280,16 @@ const oracleProvider: Provider = {
           return `${m.name} (${m.team}, ${m.position}) — ${m.primary_stat} 7d ${f.pred_7d} [${f.lo_7d}–${f.hi_7d}], heat ${heat.grade}`;
         });
         if (top.length) lines.push(`${l.toUpperCase()} (${leagues[l]?.data_date}):\n  • ${top.join("\n  • ")}`);
-        else lines.push(`${l.toUpperCase()}: ${leagues[l]?.status || "no board"}${leagues[l]?.reason ? ` — ${leagues[l].reason}` : ""}`);
+        else {
+          const boards = (leagues[l]?.leaders as Array<Record<string, unknown>>) || [];
+          const first = boards[0];
+          const lead = first
+            ? ` Season leaders (${first.stat}): ` +
+              ((first.leaders as Array<Record<string, unknown>>) || []).slice(0, 3)
+                .map((x: Record<string, unknown>) => `${x.name} (${x.team}) ${x.value}`).join(", ")
+            : "";
+          lines.push(`${l.toUpperCase()}: ${leagues[l]?.status || "no board"}${leagues[l]?.reason ? ` — ${leagues[l].reason}` : ""}.${lead}`);
+        }
       }
       if (lines.length) {
         const cal = (data?.calibration as Record<string, unknown>) || {};
