@@ -166,9 +166,9 @@ Your agent gets a unique personality derived from your NFT's visual traits — B
 | `UNDESIRABLE_EXIT_STRATEGY` | Exit planning — TP1/TP2/TP3 levels using live prices |
 | `UNDESIRABLE_RISK_ASSESSMENT` | Risk rating 1–10 using live DeFiLlama protocol TVL data |
 
-### Skills (16)
+### Skills (26)
 
-All 16 skills are available to every user — demo and NFT holder alike. Financial skills fetch live data from free APIs.
+All 26 skills are available to every user — demo and NFT holder alike. Financial skills fetch live data from free APIs.
 
 | Category | Skills | Data Source |
 |----------|--------|------------|
@@ -179,6 +179,9 @@ All 16 skills are available to every user — demo and NFT holder alike. Financi
 | **Content** | Content Creation, Image Generation, Music Generation, Meme Machine | LLM + MCP tools |
 | **Business** | Business Pilot | 23-module setup system |
 | **Logging** | Prediction Log | Local JSON ledger |
+| **Trading** | Snipe Launch, Memecoin Scanner, Ape Checklist, Copy Trade | DeFiLlama + on-chain |
+| **Risk & Sizing** | Position Sizing, Volatility Scan, Liquidation Watch, MEV Detect, Diversify Check, Sector Rotation | DeFiLlama + on-chain |
+| **Video** | Video Production | LLM + MCP tools |
 
 ---
 
@@ -198,7 +201,7 @@ All 16 skills are available to every user — demo and NFT holder alike. Financi
 
 | Feature | Demo (Free) | NFT Holder |
 |---------|:-----------:|:----------:|
-| All 16 skills | ✓ | ✓ |
+| All 26 skills | ✓ | ✓ |
 | Live Oracle data | ✓ | ✓ |
 | Live DeFiLlama + Etherscan data | ✓ | ✓ |
 | Market intelligence evaluator | ✓ | ✓ |
